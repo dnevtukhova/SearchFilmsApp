@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/contentMain">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:src="@drawable/shining" />
+
+    <TextView
+        android:id="@+id/name_shining"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/name_film_shining"
+        android:textColor="@color/colorBlack" />
+
+    <Button
+        android:id="@+id/button_shining"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/details" />
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:src="@drawable/cloud_atlas" />
+
+    <TextView
+        android:id="@+id/name_cloud_atlas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/name_film_cloud_atlas"
+        android:textColor="@color/colorBlack" />
+
+    <Button
+        android:id="@+id/button_cloud_atlas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/details" />
+
+    <Button
+        android:id="@+id/button_invite_friend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/invite_friend" />
+
+</LinearLayout>

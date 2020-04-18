@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Search Films App</string>
+    <string name="name_film_shining">Сияние</string>
+    <string name="name_film_cloud_atlas">Облачный Атлас</string>
+    <string name="details">Детали</string>
+    <string name="description_shining">Писатель Джек Торренс (Джек Николсон) с женой и сыном Денни
+        приезжает в отель Оверлок, расположенный на снежных вершинах Колорадо. Роскошный интерьер
+        гостиницы, затерянной в белом одиночестве, нагромождение залов, симметричных коридоров,
+        головоломка лабиринта. Так начинается фильм «Сияние» (1979 г.) по роману Стивена Кинга.
+    </string>
+    <string name="deccription_cloud_atlas">Фильм о том, как тесно переплетается прошлое и будущее,
+        и что одно действие, даже незначительное, происшедшее в прошлом,
+        может повлиять через поколения на судьбу людей совсем в другой стране, а то и во всем мире</string>
+    <string name="invite_friend">Пригласить друга</string>
+    <string name="invite">Дорогой друг, приглашаю тебя оценить мое приложение Search Films</string>
+    <string name="like">Нравится</string>
+    <string name="comment">Комментарий</string>
 </resources>
