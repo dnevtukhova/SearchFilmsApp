@@ -2,6 +2,7 @@ package com.example.dnevtukhova.searchfilmsapp
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,7 @@ import android.view.Menu
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatDelegate
 import com.example.dnevtukhova.searchfilmsapp.DetailActivity.Companion.EXTRA_CHECK_BOX_SHOWN
 import com.example.dnevtukhova.searchfilmsapp.DetailActivity.Companion.EXTRA_TEXT
 import com.example.dnevtukhova.searchfilmsapp.DetailActivity.Companion.newIntent
@@ -40,14 +42,14 @@ class MainActivity : AppCompatActivity() {
         buttonShining.setOnClickListener {
             clickExplicit(SHINING)
             mNameShining.setTextColor(Color.parseColor("#f34336"))
-            mNameCloudAtlas.setTextColor(Color.parseColor("#050100"))
+            mNameCloudAtlas.setTextColor(Color.parseColor("#6b6b6b"))
             mCurrentIndex=1
         }
 
         buttonCloudAtlas.setOnClickListener {
             clickExplicit(CLOUD_ATLAS)
             mNameCloudAtlas.setTextColor(Color.parseColor("#f34336"))
-            mNameShining.setTextColor(Color.parseColor("#050100"))
+            mNameShining.setTextColor(Color.parseColor("#6b6b6b"))
             mCurrentIndex=2
         }
 
@@ -58,6 +60,20 @@ class MainActivity : AppCompatActivity() {
             i.putExtra(Intent.EXTRA_TEXT, getString(R.string.invite))
             startActivity(i)
         }
+
+        val mButtonChangeTheme: Button = findViewById<Button>(R.id.button_change_theme)
+        mButtonChangeTheme.setOnClickListener {
+            if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            }
+
+          finish();
+           startActivity(Intent(applicationContext, MainActivity :: class.java));
+
+        }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -78,7 +94,16 @@ class MainActivity : AppCompatActivity() {
             }
             Log.i(TAG, "the answer is:$answer")
             Log.i(TAG, "checkbox is:$answerCheck")
-        }
+        } }
+
+    override fun onBackPressed() {
+        val dialog: Dialog = Dialog(this)
+        dialog.setContentView(R.layout.custom_dialog)
+        val yesBtn = dialog.findViewById<Button>(R.id.button_yes)
+        val noBtn = dialog.findViewById<Button>(R.id.button_no)
+        yesBtn.setOnClickListener { super.onBackPressed() }
+        noBtn.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     fun clickExplicit (value: String) {

@@ -2,47 +2,70 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
     android:id="@+id/contentMain">
 
     <ImageView
         android:layout_width="100dp"
         android:layout_height="200dp"
-        android:src="@drawable/shining" />
+        android:src="@drawable/shining"
+        android:padding="5dp"/>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
     <TextView
+        style="@style/SearchFilmTitle"
         android:id="@+id/name_shining"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/name_film_shining"
-        android:textColor="@color/colorBlack" />
+        android:text="@string/name_film_shining"/>
 
     <Button
         android:id="@+id/button_shining"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/details" />
+    </LinearLayout>
 
     <ImageView
         android:layout_width="100dp"
         android:layout_height="200dp"
-        android:src="@drawable/cloud_atlas" />
-
+        android:src="@drawable/cloud_atlas"
+        android:padding="5dp"/>
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
     <TextView
+        style="@style/SearchFilmTitle"
         android:id="@+id/name_cloud_atlas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/name_film_cloud_atlas"
-        android:textColor="@color/colorBlack" />
+        android:text="@string/name_film_cloud_atlas"/>
 
     <Button
         android:id="@+id/button_cloud_atlas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/details" />
+</LinearLayout>
+
     <Button
         android:id="@+id/button_invite_friend"
+        android:drawableLeft="@drawable/ic_star_half_white_24dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/invite_friend" />
+        android:text="@string/invite_friend"
+        android:layout_marginTop="5dp"/>
+    <Button
+        android:id="@+id/button_change_theme"
+        android:drawableLeft="@drawable/ic_brightness_4_black_24dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/change_theme"/>
+
 
 </LinearLayout>
