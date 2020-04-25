@@ -72,7 +72,7 @@ class DetailActivity : AppCompatActivity() {
         else if (s.equals(CLOUD_ATLAS))
         {
             mImageView.setImageResource(R.drawable.cloud_atlas)
-            description.setText(R.string.deccription_cloud_atlas)
+            description.setText(R.string.description_cloud_atlas)
         }
     }
 

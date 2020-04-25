@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Search Films App</string>
+    <string name="name_film_shining" translatable="false">Shining</string>
+    <string name="name_film_cloud_atlas">Cloud Atlas</string>
+    <string name="details">Details</string>
+    <string name="description_shining">Writer Jack Torrens (Jack Nicholson) with his wife and son Denny arrives at Overlock Hotel, located on the snowy peaks of Colorado. The luxurious interior of a hotel lost in white solitude, a heap of halls, symmetrical corridors, a puzzle of the maze. So begins the film \"Radiance\" (1979) based on the novel by Stephen King.</string>
+    <string name="description_cloud_atlas">The film is about how the past and the future are closely intertwined, and that one action, even a minor one, that occurred in the past, can affect, through generations, the fate of people in a completely different country, or even the whole world</string>
+    <string name="invite_friend">To invite a friend</string>
+    <string name="invite">Dear friend, I invite you to rate my Search Films app.</string>
+    <string name="like">Like</string>
+    <string name="comment">Comment</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="exit">Do you really want to exit?</string>
+    <string name="change_theme">Theme</string>
+</resources>
