@@ -1,12 +1,13 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@color/colorDarkBlue</item>
+        <item name="colorPrimaryDark">@color/colorBlue</item>
         <item name="colorAccent">@color/colorAccent</item>
 <!--        <item name="android:windowBackground">@color/colorYellow</item>-->
+        <item name="android:textColor">@color/colorWhite</item>
         <item name="buttonStyle">@style/SearchFilmButton</item>
     </style>
 
@@ -14,6 +15,7 @@
         <item name="android:background">@drawable/button_search_film</item>
         <item name="android:textColor">@color/colorWhite</item>
         <item name="android:padding">10dp</item>
+
     </style>
 
     <style name="SearchFilmTitle">
@@ -24,6 +26,12 @@
 
     <style name="SearchFilmDescription">
         <item name="android:textColor">@color/colorGray</item>
-        <item name="android:textAlignment">center</item>
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
+    <style name="DarkTheme" parent="AppTheme">
+        <item name="colorPrimary">#000000</item>
+        <item name="colorPrimaryDark">#aeaeae</item>
+        <item name="colorAccent">#ffffff</item>
     </style>
 </resources>

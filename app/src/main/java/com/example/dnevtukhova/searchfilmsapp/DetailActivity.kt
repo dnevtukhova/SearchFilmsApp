@@ -8,12 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.KeyEvent
-import android.view.View
 import android.widget.*
-import androidx.core.widget.addTextChangedListener
-import com.example.dnevtukhova.searchfilmsapp.MainActivity.Companion.CLOUD_ATLAS
-import com.example.dnevtukhova.searchfilmsapp.MainActivity.Companion.SHINING
+import androidx.appcompat.app.AppCompatDelegate
 import kotlinx.android.synthetic.main.activity_detail.*
 
 class DetailActivity : AppCompatActivity() {
@@ -27,13 +23,17 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (AppCompatDelegate.getDefaultNightMode() === AppCompatDelegate.MODE_NIGHT_YES) {
+            setTheme(R.style.DarkTheme)
+        }
         setContentView(R.layout.activity_detail)
-        var mAnswer: String = intent.getStringExtra(EXTRA_ID_BUTTON)
+        var bundle: Bundle = intent.getExtras()
+        val item : FilmsItem = bundle.getSerializable(EXTRA_ID_BUTTON) as FilmsItem
 
         mImageView = findViewById<ImageView>(R.id.image_detail_view)
         mTextView = findViewById<TextView>(R.id.description)
 
-        initializateObjects(mAnswer)
+        initializateObjects(item)
         mCheckBox = findViewById<CheckBox>(R.id.checkbox_like)
         mEditText = findViewById<EditText>(R.id.edit_text)
 
@@ -63,18 +63,12 @@ class DetailActivity : AppCompatActivity() {
     }
 
     @SuppressLint("ResourceType")
-    fun initializateObjects (s: String) {
-        if (s.equals(SHINING))
-        {
-            mImageView.setImageResource(R.drawable.shining)
-            description.setText(R.string.description_shining)
-        }
-        else if (s.equals(CLOUD_ATLAS))
-        {
-            mImageView.setImageResource(R.drawable.cloud_atlas)
-            description.setText(R.string.description_cloud_atlas)
-        }
+    fun initializateObjects (item: FilmsItem) {
+        mImageView.setImageResource(item.image)
+        description.setText(item.description)
     }
+
+
 
     fun getAnswerCheckBox (intent: Intent) {
         intent.putExtra(EXTRA_CHECK_BOX_SHOWN, isChecked)
@@ -93,9 +87,11 @@ class DetailActivity : AppCompatActivity() {
         const val EXTRA_TEXT = "com.example.dnevtukhova.searchfilmsapp.extra_text"
 
 
-        fun newIntent (packageContext: Context, nameFilm: String): Intent {
+        fun newIntent (packageContext: Context, item: FilmsItem): Intent {
              val intent = Intent (packageContext, DetailActivity::class.java)
-            intent.putExtra(EXTRA_ID_BUTTON, nameFilm)
+           val bundle : Bundle = Bundle();
+            bundle.putSerializable(EXTRA_ID_BUTTON, item);
+            intent.putExtras(bundle)
             return intent
             }
     }
