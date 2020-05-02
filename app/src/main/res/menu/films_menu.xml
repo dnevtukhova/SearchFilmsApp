@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/film_favorite"
+        android:icon="@drawable/ic_favorite_white_24dp"
+        android:title="Избранное"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/invite_friend"
+        android:icon="@drawable/ic_share_black_24dp"
+        android:title="Пригласить друга"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/app_theme"
+        android:icon="@drawable/ic_brightness_4_black_24dp"
+        android:title="Тема"
+        app:showAsAction="ifRoom" />
+
+</menu>
