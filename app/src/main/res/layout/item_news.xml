@@ -22,14 +22,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toTopOf="@id/subtitleTv"
+        app:layout_constraintBottom_toTopOf="@id/descriptionFilm"
         app:layout_constraintStart_toEndOf="@id/image"
         app:layout_constraintTop_toTopOf="@id/image"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Title" />
 
     <TextView
-        android:id="@+id/subtitleTv"
+        android:id="@+id/descriptionFilm"
         style="@style/SearchFilmDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -41,14 +41,15 @@
         app:layout_constraintTop_toBottomOf="@id/titleTv"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="Писатель Джек Торренс (Джек Николсон) с женой и сыном Денни         приезжает в отель Оверлок, расположенный на снежных вершинах Колорадо. Роскошный интерьер         гостиницы, затерянной в белом одиночестве, нагромождение залов, симметричных коридоров,         головоломка лабиринта. Так начинается фильм «Сияние» (1979 г.) по роману Стивена Кинга." />
+
     <ImageView
         android:id="@+id/imageFavourite"
+        android:contentDescription="@string/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         tools:src="@drawable/ic_favorite_border_black_24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/image"
-        />
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/descriptionFilm"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
