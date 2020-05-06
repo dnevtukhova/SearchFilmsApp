@@ -2,6 +2,7 @@ package com.example.dnevtukhova.searchfilmsapp
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,10 +12,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.fragment_film_list.*
+import java.lang.Math.random
 
 class FilmsListFragment : Fragment() {
     var listener: FilmsListListener? = null
@@ -32,6 +37,7 @@ class FilmsListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycler(view)
+        onClickFloatingActionButton()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +78,40 @@ class FilmsListFragment : Fragment() {
     interface FilmsListListener {
         fun onFilmsSelected(filmsItem: FilmsItem)
         //  fun updateAdapter(adapter: RecyclerView)
+    }
+
+    private fun onClickFloatingActionButton () {
+        floatingActionButton.setOnClickListener {
+            val filmsItem = FilmsItem(random().toInt(),R.string.name_film_cloud_atlas,
+                R.string.description_cloud_atlas,
+                R.drawable.cloud_atlas,
+                true)
+            App.items.add(filmsItem)
+            recycler.adapter?.notifyDataSetChanged()
+            addSnackBar(filmsItem, recycler)
+        }
+    }
+
+    private fun addSnackBar(filmsItem: FilmsItem, recycler: RecyclerView) {
+        // Создание экземпляра Snackbar
+        val snackBar =
+            Snackbar.make(view!!, "Фильм добавлен в список", Snackbar.LENGTH_LONG)
+        // Устанавливаем цвет текста кнопки действий
+        snackBar.setActionTextColor(ContextCompat.getColor(context!!, R.color.colorRed))
+        // Получение snackbar view
+        val snackBarView = snackBar.view
+        // Изменение цвета текста
+        val snackbarTextId = com.google.android.material.R.id.snackbar_text
+        val textView = snackBarView.findViewById<View>(snackbarTextId) as TextView
+        textView.setTextColor(ContextCompat.getColor(context!!, android.R.color.white))
+        // Изменение цвета фона
+        snackBarView.setBackgroundColor(Color.GRAY)
+        snackBar.setAnchorView(R.id.bottomNavigation)
+        snackBar.setAction("Отменить") {
+            App.items.remove(filmsItem)
+            recycler.adapter?.notifyDataSetChanged()
+        }
+            .show()
     }
 
     //region adapter and holder
