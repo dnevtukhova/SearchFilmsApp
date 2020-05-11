@@ -10,11 +10,12 @@
         android:id="@+id/bottomNavigation"
         android:layout_height="56dp"
         android:layout_width="match_parent"
-        app:itemBackground="@color/colorDarkBlue"
-        app:itemIconTint="@color/grayLight"
-        app:itemTextColor="@color/grayLight"
-        app:itemRippleColor="@color/colorGray"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/films_menu"
-        android:layout_gravity="start"/>
+        app:menu="@menu/bottom_sheet_menu"
+        android:layout_gravity="start"
+        android:background="?android:attr/windowBackground"
+        app:itemRippleColor="@color/colorGray"
+        style="@style/Widget.Design.BottomNavigationView"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
