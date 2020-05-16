@@ -14,7 +14,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
     FavoriteFragment.FilmsFavoriteAdapter.OnFavoriteFilmsClickListener {
-
+    private  var favoriteF: Boolean = false
+    private var listF: Boolean = true
     @SuppressLint("ResourceAsColor")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,14 +32,27 @@ class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
 
     override fun onBackPressed() {
         supportActionBar?.show()
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
-        } else {
+       if(supportFragmentManager.fragments.last()==supportFragmentManager.findFragmentByTag(DetailFragment.TAG)) {
+           if(favoriteF) {
+               supportFragmentManager
+                   .beginTransaction()
+                   .replace(R.id.fragmentContainer, FavoriteFragment(), FavoriteFragment.TAG)
+                   .commit()
+           }
+           if (listF) {
+               supportFragmentManager
+                   .beginTransaction()
+                   .replace(R.id.fragmentContainer, FilmsListFragment(), FilmsListFragment.TAG)
+                   .commit()
+           }
+        }
+        else
+       {
             val dialog = Dialog(this)
             dialog.setContentView(R.layout.custom_dialog)
             val yesBtn = dialog.findViewById<Button>(R.id.button_yes)
             val noBtn = dialog.findViewById<Button>(R.id.button_no)
-            yesBtn.setOnClickListener { super.onBackPressed() }
+            yesBtn.setOnClickListener { finish() }
             noBtn.setOnClickListener { dialog.dismiss() }
             dialog.show()
         }
@@ -54,7 +68,7 @@ class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
                 DetailFragment.newInstance(filmsItem),
                 DetailFragment.TAG
             )
-            .addToBackStack(null)
+            .addToBackStack(DetailFragment.TAG)
             .commit()
     }
 
@@ -104,12 +118,16 @@ class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
         bar.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.film_favorite -> {
+                    favoriteF=true
+                    listF=false
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.fragmentContainer, FavoriteFragment(), FavoriteFragment.TAG)
                         .commit()
                 }
                 R.id.all_films -> {
+                    listF=true
+                    favoriteF=false
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.fragmentContainer, FilmsListFragment(), FilmsListFragment.TAG)
