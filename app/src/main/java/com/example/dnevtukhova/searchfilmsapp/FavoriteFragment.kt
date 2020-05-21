@@ -108,8 +108,8 @@ class FavoriteFragment : Fragment() {
         var container: ConstraintLayout = itemView.findViewById(R.id.container)
 
         fun bind(item: FilmsItem) {
-            titleTv.setText(item.title)
-            subtitleTv.setText(item.description)
+            titleTv.text = item.title
+            subtitleTv.text = item.description
             Glide.with(imageFilm.context)
                 .load(FilmsListFragment.PICTURE + item.image)
                 .into(imageFilm)
@@ -133,12 +133,12 @@ class FavoriteFragment : Fragment() {
         override fun getItemCount() = items.size
 
         override fun onBindViewHolder(holder: FilmsFavouriteItemViewHolder, position: Int) {
-            holder.container.setAnimation(
+            holder.container.animation =
                 AnimationUtils.loadAnimation(
                     context,
                     R.anim.my_animation
                 )
-            )
+
             val item = items[position]
             holder.bind(item)
             holder.itemView.setOnLongClickListener {

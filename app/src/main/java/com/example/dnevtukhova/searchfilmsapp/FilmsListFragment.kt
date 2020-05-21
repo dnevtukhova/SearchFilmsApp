@@ -2,7 +2,6 @@ package com.example.dnevtukhova.searchfilmsapp
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,28 +9,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.dnevtukhova.searchfilmsapp.App.Companion.itemsFavorite
 import com.example.dnevtukhova.searchfilmsapp.App.Companion.itemsFilms
 import com.example.dnevtukhova.searchfilmsapp.Retrofit.PopularFilms
+import kotlinx.android.synthetic.main.fragment_film_list.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class FilmsListFragment : Fragment() {
     var listener: FilmsListListener? = null
-    lateinit var recycler: RecyclerView
+    private lateinit var recycler: RecyclerView
     private var pageNumber: Int = 1
     lateinit var adapterFilms: FilmsAdapter
-    lateinit var progressBar: ProgressBar
 
     @SuppressLint("ResourceType")
     override fun onCreateView(
@@ -45,12 +44,15 @@ class FilmsListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        progressBar = view.findViewById(R.id.progressbar)
-        progressBar.visibility=View.VISIBLE
-        recycler.visibility = View.INVISIBLE
-
-
         initRecycler(view)
+        progressbar.visibility = View.VISIBLE
+        swipeRefreshLayout.setOnRefreshListener {
+            if (progressbar != null) {
+                progressbar.visibility = View.GONE
+            }
+            loadData()
+            swipeRefreshLayout.isRefreshing = false
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,14 +62,9 @@ class FilmsListFragment : Fragment() {
 
     private fun initRecycler(view: View) {
         recycler = view.findViewById(R.id.recyclerViewFragment)
-      //recycler.visibility=View.GONE
-        progressBar.visibility=View.VISIBLE
-        recycler.visibility = View.INVISIBLE
-
         val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         recycler.layoutManager = layoutManager
         adapterFilms = FilmsAdapter(
-
             context!!,
             LayoutInflater.from(context),
             itemsFilms,
@@ -79,72 +76,24 @@ class FilmsListFragment : Fragment() {
                 override fun onFavouriteClick(filmsItem: FilmsItem, position: Int) {
                     if (filmsItem.favorite) {
                         itemsFilms[position].favorite = false
-                        adapterFilms?.notifyItemChanged(position)
-                        App.itemsFavorite.add(itemsFilms[position])
+                        adapterFilms.notifyItemChanged(position)
+                        itemsFavorite.add(itemsFilms[position])
                     } else {
                         itemsFilms[position].favorite = true
-                        adapterFilms?.notifyItemChanged(position)
-                        App.itemsFavorite.remove(itemsFilms[position])
+                        adapterFilms.notifyItemChanged(position)
+                        itemsFavorite.remove(itemsFilms[position])
                     }
                 }
             })
 
         recycler.adapter = adapterFilms
-loadData()
-//        recycler.visibility=View.VISIBLE
-//        adapterFilms.notifyDataSetChanged()
 
-        recycler.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        loadData()
+
+        recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (layoutManager.findLastVisibleItemPosition() == itemsFilms.size-1) {
-                    pageNumber += 1
-                    App.instance.api.getFilms(API_KEY, LANGUAGE, pageNumber)
-                        .enqueue(object : Callback<PopularFilms> {
-                            override fun onFailure(call: Call<PopularFilms>, t: Throwable) {
-                                Log.d(TAG, " !!! произошла ошибка $t")
-                            }
-
-                            override fun onResponse(
-                                call: Call<PopularFilms>,
-                                response: Response<PopularFilms>
-                            ) {
-
-                              //  itemsFilms.clear()
-                                if (response.isSuccessful) {
-                                    Log.d(
-                                        TAG,
-                                        response.toString() + " " + response.code() + " " + response.body()
-                                    )
-                                    response.body()?.results
-                                        ?.forEach {
-                                            itemsFilms.add(
-                                                FilmsItem(
-                                                    it.id,
-                                                    it.title,
-                                                    it.description,
-                                                    it.image,
-                                                    true
-                                                )
-                                            )
-                                            Log.d(TAG, it.title)
-                                        }
-//                        for (item in response.body()?.results!!) {
-//                            item.favorite = true
-//                            itemsFilms.add(item)
-//                            Log.d(TAG, item.title)
-//                            println(item.image)
-//                        }
-
-                                } else {
-                                    Log.d(
-                                        TAG,
-                                        "!!!! response.code " + response.code() + " response.body " + response.body()
-                                    )
-                                }
-                                adapterFilms.notifyItemRangeChanged(itemsFilms.size - 20, 20)
-                            }
-                        })
-                    
+                if (layoutManager.findLastVisibleItemPosition() == itemsFilms.size - 1) {
+                    loadDataInOnScrollListener()
                 }
             }
         })
@@ -152,15 +101,17 @@ loadData()
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         getDrawable(context!!, R.drawable.white_line)?.let { itemDecoration.setDrawable(it) }
         recycler.addItemDecoration(itemDecoration)
-
-
     }
 
-    private fun loadData () {
+    private fun loadData() {
         App.instance.api.getFilms(API_KEY, LANGUAGE, pageNumber)
             .enqueue(object : Callback<PopularFilms> {
                 override fun onFailure(call: Call<PopularFilms>, t: Throwable) {
                     Log.d(TAG, " !!! произошла ошибка $t")
+                    if (progressbar != null) {
+                        progressbar.visibility = View.GONE
+                    }
+                    Toast.makeText(context, "!!! произошла ошибка $t", Toast.LENGTH_LONG).show()
                 }
 
                 override fun onResponse(
@@ -182,36 +133,93 @@ loadData()
                                         it.title,
                                         it.description,
                                         it.image,
-                                        true
+                                        isFavorite(it.id)
                                     )
                                 )
                                 Log.d(TAG, it.title)
+                                if (progressbar != null) {
+                                    progressbar.visibility = View.GONE
+                                }
                             }
-//                        for (item in response.body()?.results!!) {
-//                            item.favorite = true
-//                            itemsFilms.add(item)
-//                            Log.d(TAG, item.title)
-//                            println(item.image)
-//                        }
-
                     } else {
                         Log.d(
                             TAG,
                             "!!!! response.code " + response.code() + " response.body " + response.body()
                         )
+                        if (progressbar != null) {
+                            progressbar.visibility = View.GONE
+                        }
+                        Toast.makeText(
+                            context,
+                            "!!! произошла ошибка ${response.code()}",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
-                    //  progressBar.visibility = View.INVISIBLE
-                    progressBar.visibility= View.GONE
-                   // recycler.visibility = View.VISIBLE
                     adapterFilms.notifyDataSetChanged()
-                    recycler.visibility = View.VISIBLE
+                }
+            })
+    }
+
+    private fun loadDataInOnScrollListener() {
+        pageNumber += 1
+        App.instance.api.getFilms(API_KEY, LANGUAGE, pageNumber)
+            .enqueue(object : Callback<PopularFilms> {
+                override fun onFailure(call: Call<PopularFilms>, t: Throwable) {
+                    Log.d(TAG, " !!! произошла ошибка $t")
+                    Toast.makeText(context, "!!! произошла ошибка $t", Toast.LENGTH_LONG).show()
+                }
+
+                override fun onResponse(
+                    call: Call<PopularFilms>,
+                    response: Response<PopularFilms>
+                ) {
+                    if (response.isSuccessful) {
+                        Log.d(
+                            TAG,
+                            response.toString() + " " + response.code() + " " + response.body()
+                        )
+                        response.body()?.results
+                            ?.forEach {
+                                itemsFilms.add(
+                                    FilmsItem(
+                                        it.id,
+                                        it.title,
+                                        it.description,
+                                        it.image,
+                                        isFavorite(it.id)
+                                    )
+                                )
+                                Log.d(TAG, it.title + " ${it.image}")
+                            }
+                    } else {
+                        Log.d(
+                            TAG,
+                            "!!!! response.code " + response.code() + " response.body " + response.body()
+                        )
+                        Toast.makeText(
+                            context,
+                            "!!! произошла ошибка ${response.code()}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    adapterFilms.notifyItemRangeChanged(itemsFilms.size - 20, 20)
                 }
             })
     }
 
     interface FilmsListListener {
         fun onFilmsSelected(filmsItem: FilmsItem)
-        //  fun updateAdapter(adapter: RecyclerView)
+    }
+
+    private fun isFavorite(id: Int): Boolean {
+        var isLike = true
+        for (item in itemsFavorite) {
+            if (id == item.id) {
+                isLike = false
+                break
+            }
+        }
+        return isLike
     }
 
     //region adapter and holder
@@ -223,10 +231,13 @@ loadData()
         var container: ConstraintLayout = itemView.findViewById(R.id.container)
 
         fun bind(item: FilmsItem) {
-            titleTv.setText(item.title)
-            subtitleTv.setText(item.description)
+            titleTv.text = item.title
+            subtitleTv.text = item.description
             Glide.with(imageFilm.context)
                 .load(PICTURE + item.image)
+                .placeholder(R.drawable.ic_photo_black_24dp)
+                .error(R.drawable.ic_error_outline_black_24dp)
+                .centerCrop()
                 .into(imageFilm)
 
             if (item.favorite) {
@@ -253,22 +264,16 @@ loadData()
         override fun getItemCount() = items.size
 
         override fun onBindViewHolder(holder: FilmsItemViewHolder, position: Int) {
-            holder.container.setAnimation(
+            holder.container.animation =
                 AnimationUtils.loadAnimation(
                     context,
                     R.anim.my_animation
                 )
-            )
             val item = items[position]
             holder.bind(item)
             holder.itemView.setOnClickListener { listener.onFilmsClick(item, position) }
             val imageFavourite: ImageView = holder.itemView.findViewById(R.id.imageFavourite)
             imageFavourite.setOnClickListener { listener.onFavouriteClick(item, position) }
-           // progressBar.visibility = false
-         //   progressBar.visibility = View.INVISIBLE
-          //  progressBar.visibility = View.GONE
-
-
         }
 
         interface OnFilmsClickListener {

@@ -4,18 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
-import com.example.dnevtukhova.searchfilmsapp.Retrofit.PopularFilms
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
     FavoriteFragment.FilmsFavoriteAdapter.OnFavoriteFilmsClickListener {
@@ -102,7 +97,7 @@ class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
         when (item?.itemId) {
              R.id.invite_friend -> {
                 val i = Intent(Intent.ACTION_SEND)
-                i.setType("text/plain")
+                i.type = "text/plain"
                 i.putExtra(Intent.EXTRA_TEXT, getString(R.string.invite))
                 startActivity(i)
             }
@@ -152,3 +147,6 @@ class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
         openDetailed(filmsItem)
     }
 }
+
+
+

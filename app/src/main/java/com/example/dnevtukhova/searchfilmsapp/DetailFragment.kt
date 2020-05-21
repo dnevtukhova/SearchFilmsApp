@@ -36,7 +36,7 @@ class DetailFragment : Fragment() {
         val item: FilmsItem = arguments?.getSerializable(EXTRA_ID_BUTTON) as FilmsItem
         val collapsingToolbarLayout =
             view.findViewById(R.id.collapsing_toolbar) as CollapsingToolbarLayout
-        collapsingToolbarLayout.setTitle(item.title)
+        collapsingToolbarLayout.title = item.title
         collapsingToolbarLayout.setExpandedTitleColor(
             getColor(
                 context!!,
@@ -55,7 +55,7 @@ class DetailFragment : Fragment() {
         Glide.with(mImageView.context)
             .load(FilmsListFragment.PICTURE + item.image)
             .into(mImageView)
-        description.setText(item.description)
+        description.text = item.description
     }
 
     companion object {
