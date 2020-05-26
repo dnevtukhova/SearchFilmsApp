@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import kotlinx.android.synthetic.main.fragment_detail.*
 
@@ -35,7 +36,7 @@ class DetailFragment : Fragment() {
         val item: FilmsItem = arguments?.getSerializable(EXTRA_ID_BUTTON) as FilmsItem
         val collapsingToolbarLayout =
             view.findViewById(R.id.collapsing_toolbar) as CollapsingToolbarLayout
-        collapsingToolbarLayout.setTitle(getText(item.title))
+        collapsingToolbarLayout.title = item.title
         collapsingToolbarLayout.setExpandedTitleColor(
             getColor(
                 context!!,
@@ -51,8 +52,10 @@ class DetailFragment : Fragment() {
 
     @SuppressLint("ResourceType")
     fun initializeObjects(item: FilmsItem) {
-        mImageView.setImageResource(item.image)
-        description.setText(item.description)
+        Glide.with(mImageView.context)
+            .load(FilmsListFragment.PICTURE + item.image)
+            .into(mImageView)
+        description.text = item.description
     }
 
     companion object {

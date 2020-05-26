@@ -4,8 +4,6 @@
     <string name="name_film_shining" translatable="false">Shining</string>
     <string name="name_film_cloud_atlas">Cloud Atlas</string>
     <string name="details">Details</string>
-    <string name="description_shining">Writer Jack Torrens (Jack Nicholson) with his wife and son Denny arrives at Overlock Hotel, located on the snowy peaks of Colorado. The luxurious interior of a hotel lost in white solitude, a heap of halls, symmetrical corridors, a puzzle of the maze. So begins the film \"Radiance\" (1979) based on the novel by Stephen King.</string>
-    <string name="description_cloud_atlas">The film is about how the past and the future are closely intertwined, and that one action, even a minor one, that occurred in the past, can affect, through generations, the fate of people in a completely different country, or even the whole world</string>
     <string name="invite_friend">To invite a friend</string>
     <string name="invite">Dear friend, I invite you to rate my Search Films app.</string>
     <string name="like">Like</string>
@@ -14,17 +12,9 @@
     <string name="no">No</string>
     <string name="exit">Do you really want to exit?</string>
     <string name="change_theme">Theme</string>
-    <string name="inception">Incep</string>
-    <string name="inception_description">Cobb is a talented thief, the best of the best in the dangerous art of extraction: he steals valuable secrets from the depths of the subconscious during sleep, when the human mind is most vulnerable. Cobb\'s rare abilities made him a valuable player in the treacherous world of industrial espionage, but they also turned him into a perpetual fugitive and robbed him of everything he had ever loved.</string>
-    <string name="joker">Joker</string>
-    <string name="joker_description">"Gotham, the beginning of the 1980-ies. Comedian Arthur Fleck lives with a sick mother who teaches him to \"walk with a smile\"since childhood. Trying to bring good to the world and give people joy, Arthur faces human cruelty and gradually comes to the conclusion that this world will receive from him not a kind smile, but the grin of a villain-Joker. "</string>
-    <string name="ford">Ford and Ferrari</string>
-    <string name="ford_description">We are talking about a group of American engineers and designers. In the 1960s, under the leadership of designer Carroll Shelby and with the support of British driver Ken miles, they had to create a completely new sports car from scratch that could beat Ferrari-the undefeated champion of the 24-hour Le Mans endurance race.</string>
-    <string name="maleficent">Maleficent</string>
-    <string name="maleficent_description">The action takes place several years after Maleficent cast an evil spell on Princess Aurora. The film tells about the complex relationship between the dark fairy and the future Queen, about new allies and opponents in the protection of the magic forest and the magical creatures that live in it.</string>
-    <string name="green_book">Green Book</string>
-    <string name="green_book_description">A sophisticated socialite, rich and talented musician hires as a driver and bodyguard the person who is least suitable for this job. Tony \"the Chatterbox\" is a bouncer who can\'t keep his mouth shut and use Cutlery, but he\'s good with his fists. This tour will change their lives forever.</string>
     <string name="menuTheme">Theme</string>
     <string name="menuInviteFriends">Add friend</string>
     <string name="menuLike">Like</string>
+    <string name="image">Image</string>
+    <string name="all_films">Films</string>
 </resources>

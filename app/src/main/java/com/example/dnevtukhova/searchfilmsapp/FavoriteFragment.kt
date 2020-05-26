@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 
 class FavoriteFragment : Fragment() {
@@ -50,9 +51,9 @@ class FavoriteFragment : Fragment() {
                 ): Boolean {
                     App.itemsFavorite.remove(filmsItem)
                     filmsItem.favorite = true
-                    for (i in App.items.indices) {
-                        if (App.items[i].id == filmsItem.id) {
-                            App.items[i] = filmsItem
+                    for (i in App.itemsFilms.indices) {
+                        if (App.itemsFilms[i].id == filmsItem.id) {
+                            App.itemsFilms[i] = filmsItem
                         }
                     }
                     addSnackBar(filmsItem, position, recycler)
@@ -89,9 +90,9 @@ class FavoriteFragment : Fragment() {
         snackBar.setAction("Отменить") {
             App.itemsFavorite.add(filmsItem)
             filmsItem.favorite = false
-            for (i in App.items.indices) {
-                if (App.items[i].id == filmsItem.id) {
-                    App.items[i] = filmsItem
+            for (i in App.itemsFilms.indices) {
+                if (App.itemsFilms[i].id == filmsItem.id) {
+                    App.itemsFilms[i] = filmsItem
                 }
             }
             recycler.adapter?.notifyDataSetChanged()
@@ -107,9 +108,11 @@ class FavoriteFragment : Fragment() {
         var container: ConstraintLayout = itemView.findViewById(R.id.container)
 
         fun bind(item: FilmsItem) {
-            titleTv.setText(item.title)
-            subtitleTv.setText(item.description)
-            imageFilm.setImageResource(item.image)
+            titleTv.text = item.title
+            subtitleTv.text = item.description
+            Glide.with(imageFilm.context)
+                .load(FilmsListFragment.PICTURE + item.image)
+                .into(imageFilm)
         }
     }
 
@@ -130,12 +133,12 @@ class FavoriteFragment : Fragment() {
         override fun getItemCount() = items.size
 
         override fun onBindViewHolder(holder: FilmsFavouriteItemViewHolder, position: Int) {
-            holder.container.setAnimation(
+            holder.container.animation =
                 AnimationUtils.loadAnimation(
                     context,
                     R.anim.my_animation
                 )
-            )
+
             val item = items[position]
             holder.bind(item)
             holder.itemView.setOnLongClickListener {

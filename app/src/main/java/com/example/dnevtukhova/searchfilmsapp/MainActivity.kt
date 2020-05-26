@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
             setTheme(R.style.DarkTheme)
         }
         setContentView(R.layout.activity_main)
+
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragmentContainer, FilmsListFragment(), FilmsListFragment.TAG)
@@ -96,7 +97,7 @@ class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
         when (item?.itemId) {
              R.id.invite_friend -> {
                 val i = Intent(Intent.ACTION_SEND)
-                i.setType("text/plain")
+                i.type = "text/plain"
                 i.putExtra(Intent.EXTRA_TEXT, getString(R.string.invite))
                 startActivity(i)
             }
@@ -146,3 +147,6 @@ class MainActivity : AppCompatActivity(), FilmsListFragment.FilmsListListener,
         openDetailed(filmsItem)
     }
 }
+
+
+

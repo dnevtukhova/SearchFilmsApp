@@ -19,14 +19,15 @@
     <TextView
         style="@style/SearchFilmTitle"
         android:id="@+id/titleTv"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         app:layout_constraintBottom_toTopOf="@id/descriptionFilm"
         app:layout_constraintStart_toEndOf="@id/image"
         app:layout_constraintTop_toTopOf="@id/image"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="Title" />
+        app:layout_constraintEnd_toEndOf="@id/descriptionFilm"
+        tools:text="Title very big title jkgjjkj  hgkjhkhkhkhkhklhlkhlk" />
 
     <TextView
         android:id="@+id/descriptionFilm"
