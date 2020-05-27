@@ -1,4 +1,4 @@
-package com.example.dnevtukhova.searchfilmsapp
+package com.example.dnevtukhova.searchfilmsapp.presentation.view
 
 import android.content.Context
 import android.graphics.Color
@@ -13,13 +13,24 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.dnevtukhova.searchfilmsapp.App
+import com.example.dnevtukhova.searchfilmsapp.R
+import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsListViewModel
+import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
 import com.google.android.material.snackbar.Snackbar
+import java.util.*
 
 class FavoriteFragment : Fragment() {
     var listener: FilmsFavoriteAdapter.OnFavoriteFilmsClickListener? = null
+    private lateinit var favoriteViewModel: FilmsListViewModel
+    private lateinit var adapterFavoriteFilms: FilmsFavoriteAdapter
 
     companion object {
         const val TAG = "FavoriteFragment"
@@ -36,49 +47,64 @@ class FavoriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycler(view)
+        val myViewModelFactory = FilmsViewModelFactory(App.instance.filmsInteractor)
+        favoriteViewModel = ViewModelProvider(
+            requireActivity(),
+            myViewModelFactory
+        ).get(FilmsListViewModel::class.java)
+        favoriteViewModel.favoriteFilms.observe(
+            this.viewLifecycleOwner,
+            Observer<List<FilmsItem>> { films -> adapterFavoriteFilms.setItems(films) })
+        favoriteViewModel.getFavorite()
     }
 
     private fun initRecycler(view: View) {
         val recycler = view.findViewById<RecyclerView>(R.id.recyclerViewFavorite)
-        recycler.adapter = FilmsFavoriteAdapter(context!!,
-            LayoutInflater.from(context),
-            App.itemsFavorite,
-            //по долгому клику удаление элемента
-            object : FilmsFavoriteAdapter.OnFavoriteFilmsClickListener {
-                override fun onFavoriteFilmsLongClick(
-                    filmsItem: FilmsItem,
-                    position: Int
-                ): Boolean {
-                    App.itemsFavorite.remove(filmsItem)
-                    filmsItem.favorite = true
-                    for (i in App.itemsFilms.indices) {
-                        if (App.itemsFilms[i].id == filmsItem.id) {
-                            App.itemsFilms[i] = filmsItem
-                        }
+        adapterFavoriteFilms =
+            FilmsFavoriteAdapter(
+                context!!,
+                LayoutInflater.from(context),
+                //по долгому клику удаление элемента
+                object :
+                    FilmsFavoriteAdapter.OnFavoriteFilmsClickListener {
+                    override fun onFavoriteFilmsLongClick(
+                        filmsItem: FilmsItem,
+                        position: Int
+                    ): Boolean {
+                        favoriteViewModel.removeFromFavorite(filmsItem, true)
+                        addSnackBar(filmsItem)
+                        favoriteViewModel.getFavorite()
+                        adapterFavoriteFilms.notifyDataSetChanged()
+                        return true
                     }
-                    addSnackBar(filmsItem, position, recycler)
-                    recycler.adapter?.notifyDataSetChanged()
-                    return true
-                }
 
-                override fun onFavoriteFilmsFClick(filmsItem: FilmsItem, position: Int) {
-                    listener?.onFavoriteFilmsFClick(filmsItem, position)
-                }
-            })
-
+                    override fun onFavoriteFilmsFClick(filmsItem: FilmsItem, position: Int) {
+                        favoriteViewModel.selectFilm(filmsItem)
+                        listener?.onFavoriteFilmsFClick(filmsItem, position)
+                    }
+                })
+        recycler.adapter = adapterFavoriteFilms
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-        AppCompatResources.getDrawable(context!!, R.drawable.white_line)
+        AppCompatResources.getDrawable(
+            context!!,
+            R.drawable.white_line
+        )
             ?.let { itemDecoration.setDrawable(it) }
         recycler.addItemDecoration(itemDecoration)
     }
 
-    private fun addSnackBar(filmsItem: FilmsItem, position: Int, recycler: RecyclerView) {
+    private fun addSnackBar(filmsItem: FilmsItem) {
         // Создание экземпляра Snackbar
         val snackBar =
-            Snackbar.make(view!!, "Удален элемент № $position", Snackbar.LENGTH_LONG)
+            Snackbar.make(view!!, "Удален фильм '${filmsItem.title}'", Snackbar.LENGTH_LONG)
         // Устанавливаем цвет текста кнопки действий
-        snackBar.setActionTextColor(ContextCompat.getColor(context!!, R.color.colorRed))
-        // Получение snackbar view
+        snackBar.setActionTextColor(
+            ContextCompat.getColor(
+                context!!,
+                R.color.colorRed
+            )
+        )
+        // Получение snackbar
         val snackBarView = snackBar.view
         // Изменение цвета текста
         val snackbarTextId = com.google.android.material.R.id.snackbar_text
@@ -88,14 +114,9 @@ class FavoriteFragment : Fragment() {
         snackBarView.setBackgroundColor(Color.GRAY)
         snackBar.setAnchorView(R.id.bottomNavigation)
         snackBar.setAction("Отменить") {
-            App.itemsFavorite.add(filmsItem)
-            filmsItem.favorite = false
-            for (i in App.itemsFilms.indices) {
-                if (App.itemsFilms[i].id == filmsItem.id) {
-                    App.itemsFilms[i] = filmsItem
-                }
-            }
-            recycler.adapter?.notifyDataSetChanged()
+            favoriteViewModel.addToFavorite(filmsItem, false)
+            favoriteViewModel.getFavorite()
+            adapterFavoriteFilms.notifyDataSetChanged()
         }
             .show()
     }
@@ -112,6 +133,10 @@ class FavoriteFragment : Fragment() {
             subtitleTv.text = item.description
             Glide.with(imageFilm.context)
                 .load(FilmsListFragment.PICTURE + item.image)
+                .placeholder(R.drawable.ic_photo_black_24dp)
+                .error(R.drawable.ic_error_outline_black_24dp)
+                .centerCrop()
+                .transform(RoundedCorners(30))
                 .into(imageFilm)
         }
     }
@@ -119,15 +144,28 @@ class FavoriteFragment : Fragment() {
     class FilmsFavoriteAdapter(
         private val context: Context,
         private val inflater: LayoutInflater,
-        private val items: List<FilmsItem>,
         private val listener: OnFavoriteFilmsClickListener
     ) :
         RecyclerView.Adapter<FilmsFavouriteItemViewHolder>() {
+        private val items = ArrayList<FilmsItem>()
+
+        fun setItems(films: List<FilmsItem>) {
+            items.clear()
+            items.addAll(films)
+            notifyDataSetChanged()
+        }
+
         override fun onCreateViewHolder(
             parent: ViewGroup,
             viewType: Int
         ): FilmsFavouriteItemViewHolder {
-            return FilmsFavouriteItemViewHolder(inflater.inflate(R.layout.item_news, parent, false))
+            return FilmsFavouriteItemViewHolder(
+                inflater.inflate(
+                    R.layout.item_news,
+                    parent,
+                    false
+                )
+            )
         }
 
         override fun getItemCount() = items.size

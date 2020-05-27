@@ -1,4 +1,4 @@
-package com.example.dnevtukhova.searchfilmsapp.Retrofit
+package com.example.dnevtukhova.searchfilmsapp.data.entity
 
 import com.google.gson.annotations.SerializedName
 
