@@ -1,4 +1,4 @@
-package com.example.dnevtukhova.searchfilmsapp
+package com.example.dnevtukhova.searchfilmsapp.data
 
 import java.io.Serializable
 
@@ -7,4 +7,4 @@ data class FilmsItem (
     var title: String,
     var description: String,
     var image: String?,
-    var favorite: Boolean) : Serializable
+    var favorite: Boolean): Serializable

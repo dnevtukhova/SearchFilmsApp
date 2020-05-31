@@ -21,7 +21,7 @@
             android:layout_height="match_parent"
             android:background="@color/grayLight"
             tools:itemCount="33"
-            tools:listitem="@layout/item_news" />
+            tools:listitem="@layout/item_news"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

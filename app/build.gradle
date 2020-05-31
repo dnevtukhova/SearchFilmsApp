@@ -48,4 +48,8 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.71828") {
         exclude group: 'com.squareup.okhttp3'
     }
+
+    implementation 'jp.wasabeef:picasso-transformations:2.2.1'
+
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
 }
