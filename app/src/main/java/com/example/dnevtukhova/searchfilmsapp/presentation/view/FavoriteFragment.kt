@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
+import com.example.dnevtukhova.searchfilmsapp.data.FavoriteItem
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsListViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
@@ -52,10 +53,10 @@ class FavoriteFragment : Fragment() {
             requireActivity(),
             myViewModelFactory
         ).get(FilmsListViewModel::class.java)
-        favoriteViewModel.favoriteFilms.observe(
+        favoriteViewModel.favoriteFilms?.observe(
             this.viewLifecycleOwner,
-            Observer<List<FilmsItem>> { films -> adapterFavoriteFilms.setItems(films) })
-        favoriteViewModel.getFavorite()
+            Observer<List<FavoriteItem>> { films -> adapterFavoriteFilms.setItems(films) })
+        //   favoriteViewModel.getFavorite()
     }
 
     private fun initRecycler(view: View) {
@@ -68,18 +69,24 @@ class FavoriteFragment : Fragment() {
                 object :
                     FilmsFavoriteAdapter.OnFavoriteFilmsClickListener {
                     override fun onFavoriteFilmsLongClick(
-                        filmsItem: FilmsItem,
+                        filmsItem: FavoriteItem,
                         position: Int
                     ): Boolean {
                         favoriteViewModel.removeFromFavorite(filmsItem, true)
                         addSnackBar(filmsItem)
-                        favoriteViewModel.getFavorite()
                         adapterFavoriteFilms.notifyDataSetChanged()
                         return true
                     }
 
-                    override fun onFavoriteFilmsFClick(filmsItem: FilmsItem, position: Int) {
-                        favoriteViewModel.selectFilm(filmsItem)
+                    override fun onFavoriteFilmsFClick(filmsItem: FavoriteItem, position: Int) {
+                        val f = FilmsItem(
+                            filmsItem.id,
+                            filmsItem.title,
+                            filmsItem.description,
+                            filmsItem.image,
+                            filmsItem.favorite
+                        )
+                        favoriteViewModel.selectFilm(f)
                         listener?.onFavoriteFilmsFClick(filmsItem, position)
                     }
                 })
@@ -93,7 +100,7 @@ class FavoriteFragment : Fragment() {
         recycler.addItemDecoration(itemDecoration)
     }
 
-    private fun addSnackBar(filmsItem: FilmsItem) {
+    private fun addSnackBar(filmsItem: FavoriteItem) {
         // Создание экземпляра Snackbar
         val snackBar =
             Snackbar.make(view!!, "Удален фильм '${filmsItem.title}'", Snackbar.LENGTH_LONG)
@@ -115,7 +122,7 @@ class FavoriteFragment : Fragment() {
         snackBar.setAnchorView(R.id.bottomNavigation)
         snackBar.setAction("Отменить") {
             favoriteViewModel.addToFavorite(filmsItem, false)
-            favoriteViewModel.getFavorite()
+            //   favoriteViewModel.getFavorite()
             adapterFavoriteFilms.notifyDataSetChanged()
         }
             .show()
@@ -128,7 +135,7 @@ class FavoriteFragment : Fragment() {
         private val imageFilm: ImageView = itemView.findViewById(R.id.image)
         var container: ConstraintLayout = itemView.findViewById(R.id.container)
 
-        fun bind(item: FilmsItem) {
+        fun bind(item: FavoriteItem) {
             titleTv.text = item.title
             subtitleTv.text = item.description
             Glide.with(imageFilm.context)
@@ -147,9 +154,9 @@ class FavoriteFragment : Fragment() {
         private val listener: OnFavoriteFilmsClickListener
     ) :
         RecyclerView.Adapter<FilmsFavouriteItemViewHolder>() {
-        private val items = ArrayList<FilmsItem>()
+        private val items = ArrayList<FavoriteItem>()
 
-        fun setItems(films: List<FilmsItem>) {
+        fun setItems(films: List<FavoriteItem>) {
             items.clear()
             items.addAll(films)
             notifyDataSetChanged()
@@ -189,8 +196,8 @@ class FavoriteFragment : Fragment() {
         }
 
         interface OnFavoriteFilmsClickListener {
-            fun onFavoriteFilmsLongClick(filmsItem: FilmsItem, position: Int): Boolean
-            fun onFavoriteFilmsFClick(filmsItem: FilmsItem, position: Int)
+            fun onFavoriteFilmsLongClick(filmsItem: FavoriteItem, position: Int): Boolean
+            fun onFavoriteFilmsFClick(filmsItem: FavoriteItem, position: Int)
         }
     }
     //endregion

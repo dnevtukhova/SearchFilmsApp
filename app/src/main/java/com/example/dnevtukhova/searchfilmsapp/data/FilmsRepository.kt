@@ -1,39 +1,62 @@
 package com.example.dnevtukhova.searchfilmsapp.data
 
-class FilmsRepository {
-    private var itemsFavorite = mutableListOf<FilmsItem>()
-    private var itemsFilms = mutableListOf<FilmsItem>()
+import androidx.lifecycle.LiveData
+import java.util.concurrent.Executors
 
-    fun getFilms(): List<FilmsItem> {
-        return itemsFilms
-    }
+class FilmsRepository(filmsDb: FilmsDb?) {
+    private var filmsDao = filmsDb?.getFilmsDao()
+    private var filmsLiveData: LiveData<List<FilmsItem>>? = filmsDao?.getFilms()
+    private var favoriteLiveData: LiveData<List<FavoriteItem>>? = filmsDao?.getAllFavorite()
 
-    fun getFavoriteFilms(): List<FilmsItem> {
-        return itemsFavorite
-    }
+    val films: LiveData<List<FilmsItem>>?
+        get() = filmsLiveData
+    val favoriteFilms: LiveData<List<FavoriteItem>>?
+        get() = favoriteLiveData
 
     fun addToCache(films: List<FilmsItem>) {
-        this.itemsFilms.addAll(films)
-    }
-
-    fun addToFavorite(itemFilm: FilmsItem) {
-        itemsFavorite.add(itemFilm)
-    }
-
-
-    fun removeFromFavorite(itemFilm: FilmsItem) {
-        itemsFavorite.remove(itemFilm)
-    }
-
-    fun setFilms(itemFilm: FilmsItem, position: Int) {
-        itemsFilms[position] = itemFilm
-    }
-
-    fun setFilms(itemFilm: FilmsItem, favorite: Boolean) {
-        for (i in itemsFilms.indices) {
-            if (itemsFilms[i].id == itemFilm.id) {
-                itemsFilms[i].favorite = favorite
-            }
+        Executors.newSingleThreadExecutor().execute {
+            filmsDao?.insertAll(films)
         }
     }
+
+    fun getItemFavorite(id: Int): FavoriteItem? {
+        return filmsDao?.getItemFavorite(id)
+    }
+
+    fun addToFavorite(favoriteItem: FavoriteItem, isFavorite: Boolean) {
+        Executors.newSingleThreadExecutor().execute {
+            filmsDao?.insertInFavorite(favoriteItem)
+            filmsDao?.updateIsFavorite(favoriteItem.id, isFavorite)
+        }
+    }
+
+    fun addToFavorite(itemFilm: FavoriteItem) {
+        Executors.newSingleThreadExecutor().execute {
+            filmsDao?.insertInFavorite(itemFilm)
+        }
+    }
+
+
+    fun removeFromFavorite(itemFilm: FavoriteItem) {
+        Executors.newSingleThreadExecutor().execute {
+            filmsDao?.deleteItemFavorite(itemFilm)
+        }
+    }
+
+    fun setFilms(itemFilm: FilmsItem) {
+        Executors.newSingleThreadExecutor().execute {
+            filmsDao?.updateFilms(itemFilm)
+        }
+    }
+
+    fun setFilms(itemFilm: FavoriteItem, favorite: Boolean) {
+        Executors.newSingleThreadExecutor().execute {
+            filmsDao?.setFilms(itemFilm.id, favorite)
+        }
+    }
+
+    fun removeAllFilms() {
+        filmsDao?.removeAllFilms()
+    }
 }
+

@@ -1,6 +1,5 @@
 package com.example.dnevtukhova.searchfilmsapp.data
 
-import com.example.dnevtukhova.searchfilmsapp.data.PopularFilms
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
