@@ -5,16 +5,16 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
-@Entity (tableName = "films_table",
-        indices = [
-            Index(value = ["id"])]
-    )
-    data class FilmsItem (
+@Entity(
+    tableName = "favorite_table",
+    indices = [
+        Index(value = ["id"])]
+)
+data class FavoriteItem(
+    @PrimaryKey
     var id: Int,
     var title: String,
     var description: String,
     var image: String?,
-    var favorite: Boolean): Serializable {
-    @PrimaryKey(autoGenerate = true)
-    var idFilms = 0
-}
+    var favorite: Boolean
+) : Serializable

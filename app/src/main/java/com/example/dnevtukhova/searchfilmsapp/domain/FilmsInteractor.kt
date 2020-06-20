@@ -1,18 +1,18 @@
 package com.example.dnevtukhova.searchfilmsapp.domain
 
-import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
-import com.example.dnevtukhova.searchfilmsapp.data.FilmsRepository
-import com.example.dnevtukhova.searchfilmsapp.data.PopularFilms
-import com.example.dnevtukhova.searchfilmsapp.data.ServerApi
+import androidx.lifecycle.LiveData
+import com.example.dnevtukhova.searchfilmsapp.data.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class FilmsInteractor(
     private val serverApi: ServerApi,
-    private val filmsRepository: FilmsRepository
+    private var filmsRepository: FilmsRepository
+
 ) {
     fun getFilms(key: String, language: String, page: Int, callback: GetFilmsCallback) {
+
         serverApi.getFilms(key, language, page).enqueue(object : Callback<PopularFilms> {
             override fun onResponse(call: Call<PopularFilms>, response: Response<PopularFilms>) {
                 if (response.isSuccessful) {
@@ -30,7 +30,8 @@ class FilmsInteractor(
                             )
                         }
                     filmsRepository.addToCache(filmsList)
-                    callback.onSuccess(filmsRepository.getFilms())
+
+                    callback.onSuccess(filmsRepository.films)
                 } else {
                     callback.onError("!!! произошла ошибка ${response.code()}")
                 }
@@ -42,52 +43,59 @@ class FilmsInteractor(
         })
     }
 
-    fun getFavorite(callback: GetFavoriteCallback) {
-        callback.getFavorite(filmsRepository.getFavoriteFilms())
+    fun getFilms(): LiveData<List<FilmsItem>>? {
+        return filmsRepository.films
+    }
+
+    fun getFavorite(): LiveData<List<FavoriteItem>>? {
+        return filmsRepository.favoriteFilms
     }
 
     interface GetFilmsCallback {
-        fun onSuccess(films: List<FilmsItem>)
+        fun onSuccess(films: LiveData<List<FilmsItem>>?)
         fun onError(error: String)
-    }
-
-    interface GetFavoriteCallback {
-        fun getFavorite(films: List<FilmsItem>)
     }
 
     private fun isFavorite(id: Int): Boolean {
         var isLike = true
-        for (item in filmsRepository.getFavoriteFilms()) {
-            if (id == item.id) {
-                isLike = false
-                break
-            }
+        if (filmsRepository.getItemFavorite(id) != null) {
+            isLike = false
         }
         return isLike
     }
 
-    fun selectFavorite(filmsItem: FilmsItem, position: Int) {
-        val f: FilmsItem = filmsRepository.getFilms()[position]
-        if (filmsItem.favorite) {
-
+    fun selectFavorite(filmsItem: FilmsItem) {
+        val f = FavoriteItem(
+            filmsItem.id,
+            filmsItem.title,
+            filmsItem.description,
+            filmsItem.image,
+            filmsItem.favorite
+        )
+        if (f.favorite) {
             f.favorite = false
-            filmsRepository.setFilms(f, position)
+            filmsItem.favorite = false
+            filmsRepository.setFilms(filmsItem)
             filmsRepository.addToFavorite(f)
-
         } else {
-            f.favorite = true
-            filmsRepository.setFilms(f, position)
             filmsRepository.removeFromFavorite(f)
+            filmsItem.favorite = true
+            filmsRepository.setFilms(filmsItem)
         }
     }
 
-    fun removeFromFavorite(filmsItem: FilmsItem, favorite: Boolean) {
-        filmsRepository.removeFromFavorite(filmsItem)
-        filmsRepository.setFilms(filmsItem, favorite)
+    fun removeFromFavorite(favoriteItem: FavoriteItem, favorite: Boolean) {
+        filmsRepository.removeFromFavorite(favoriteItem)
+        filmsRepository.setFilms(favoriteItem, favorite)
     }
 
-    fun addToFavorite(filmsItem: FilmsItem, favorite: Boolean) {
-        filmsRepository.addToFavorite(filmsItem)
-        filmsRepository.setFilms(filmsItem, favorite)
+    fun addToFavorite(favoriteItem: FavoriteItem, favorite: Boolean) {
+        filmsRepository.addToFavorite(favoriteItem, favorite)
+        filmsRepository.setFilms(favoriteItem, favorite)
     }
+
+    fun removeAllFilms() {
+        filmsRepository.removeAllFilms()
+    }
+
 }

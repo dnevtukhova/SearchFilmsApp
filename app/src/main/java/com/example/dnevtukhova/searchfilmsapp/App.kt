@@ -1,6 +1,8 @@
 package com.example.dnevtukhova.searchfilmsapp
 
 import android.app.Application
+import androidx.room.Room
+import com.example.dnevtukhova.searchfilmsapp.data.FilmsDb
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsRepository
 import com.example.dnevtukhova.searchfilmsapp.data.ServerApi
 import com.example.dnevtukhova.searchfilmsapp.domain.FilmsInteractor
@@ -15,22 +17,24 @@ class App : Application() {
         const val BASE_URL = "https://api.themoviedb.org/3/movie/"
         lateinit var instance: App
             private set
-
         const val API_KEY = "79c459d10744203ee914c139f789d1e8"
         const val LANGUAGE = "ru-RUS"
-        var pageNumber: Int = 1
-
+        const val CURRENT_DATE = "current date"
+        const val PAGE_NUMBER = "page number"
         var favoriteF: Boolean = false
         var listF: Boolean = true
     }
 
     lateinit var api: ServerApi
     lateinit var filmsInteractor: FilmsInteractor
-    private var filmsRepository = FilmsRepository()
+    private lateinit var filmsRepository: FilmsRepository
+    private var INSTANCE: FilmsDb? = null
 
     override fun onCreate() {
         super.onCreate()
         instance = this
+        initDb()
+        filmsRepository = FilmsRepository(INSTANCE)
         initRetrofit()
         initInteractor()
     }
@@ -55,5 +59,22 @@ class App : Application() {
 
     private fun initInteractor() {
         filmsInteractor = FilmsInteractor(api, filmsRepository)
+    }
+
+    private fun initDb(): FilmsDb? {
+        if (INSTANCE == null) {
+            synchronized(FilmsDb::class) {
+
+                INSTANCE = Room.databaseBuilder(
+                    applicationContext,
+                    FilmsDb::class.java,
+                    "films_database"
+
+                )
+                    .allowMainThreadQueries()
+                    .build()
+            }
+        }
+        return INSTANCE
     }
 }
