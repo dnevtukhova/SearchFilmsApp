@@ -25,7 +25,8 @@ class FilmsInteractor(
                                     it.title,
                                     it.description,
                                     it.image,
-                                    isFavorite(it.id)
+                                    isFavorite(it.id),
+                                    isWatchLater(it.id)
                                 )
                             )
                         }
@@ -70,7 +71,8 @@ class FilmsInteractor(
             filmsItem.title,
             filmsItem.description,
             filmsItem.image,
-            filmsItem.favorite
+            filmsItem.favorite,
+            filmsItem.watchLater
         )
         if (f.favorite) {
             f.favorite = false
@@ -86,16 +88,55 @@ class FilmsInteractor(
 
     fun removeFromFavorite(favoriteItem: FavoriteItem, favorite: Boolean) {
         filmsRepository.removeFromFavorite(favoriteItem)
-        filmsRepository.setFilms(favoriteItem, favorite)
+        filmsRepository.setFavorite(favoriteItem, favorite)
     }
 
     fun addToFavorite(favoriteItem: FavoriteItem, favorite: Boolean) {
         filmsRepository.addToFavorite(favoriteItem, favorite)
-        filmsRepository.setFilms(favoriteItem, favorite)
+        filmsRepository.setFavorite(favoriteItem, favorite)
     }
 
     fun removeAllFilms() {
         filmsRepository.removeAllFilms()
     }
 
+    //watchLater
+
+    fun getWatchLater(): LiveData<List<WatchLaterItem>>? {
+        return filmsRepository.watchLaterFilms
+    }
+
+    fun selectWatchLater(filmsItem: FilmsItem, dateToWatch: Long) {
+        val w = WatchLaterItem(
+            filmsItem.id,
+            filmsItem.title,
+            filmsItem.description,
+            filmsItem.image,
+            filmsItem.favorite,
+            filmsItem.watchLater,
+            dateToWatch
+        )
+        if (w.watchLater) {
+            w.watchLater = false
+            filmsItem.watchLater = false
+            filmsRepository.setFilms(filmsItem)
+            filmsRepository.addToWatchLater(w)
+        } else {
+            filmsRepository.removeFromWatchLater(filmsRepository.getItemWatchLater(filmsItem.id)!!)
+            filmsItem.watchLater = true
+            filmsRepository.setFilms(filmsItem)
+        }
+    }
+
+    private fun isWatchLater(id: Int): Boolean {
+        var isWatchLater = true
+        if (filmsRepository.getItemWatchLater(id) != null) {
+            isWatchLater = false
+        }
+        return isWatchLater
+    }
+
+    fun setDateToWatch(watchLaterItem: WatchLaterItem) {
+        filmsRepository.setDateToWatch(watchLaterItem)
+    }
 }

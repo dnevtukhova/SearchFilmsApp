@@ -56,7 +56,6 @@ class FavoriteFragment : Fragment() {
         favoriteViewModel.favoriteFilms?.observe(
             this.viewLifecycleOwner,
             Observer<List<FavoriteItem>> { films -> adapterFavoriteFilms.setItems(films) })
-        //   favoriteViewModel.getFavorite()
     }
 
     private fun initRecycler(view: View) {
@@ -84,11 +83,13 @@ class FavoriteFragment : Fragment() {
                             filmsItem.title,
                             filmsItem.description,
                             filmsItem.image,
-                            filmsItem.favorite
+                            filmsItem.favorite,
+                            filmsItem.watchLater
                         )
                         favoriteViewModel.selectFilm(f)
-                        listener?.onFavoriteFilmsFClick(filmsItem, position)
-                    }
+                      listener?.onFavoriteFilmsFClick(filmsItem, position)
+                        adapterFavoriteFilms.notifyItemChanged(position)
+                     }
                 })
         recycler.adapter = adapterFavoriteFilms
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
@@ -122,7 +123,6 @@ class FavoriteFragment : Fragment() {
         snackBar.setAnchorView(R.id.bottomNavigation)
         snackBar.setAction("Отменить") {
             favoriteViewModel.addToFavorite(filmsItem, false)
-            //   favoriteViewModel.getFavorite()
             adapterFavoriteFilms.notifyDataSetChanged()
         }
             .show()

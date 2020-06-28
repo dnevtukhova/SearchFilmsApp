@@ -6,7 +6,7 @@ import androidx.room.*
 
 @Dao
 interface FilmsDao {
-    @Query("select * from films_table")
+    @Query("SELECT * FROM films_table")
     fun getFilms(): LiveData<List<FilmsItem>>
 
     @Insert (onConflict = OnConflictStrategy.REPLACE)
@@ -15,7 +15,7 @@ interface FilmsDao {
     @Query("DELETE FROM films_table")
     fun removeAllFilms()
 
-    @Query("select * from favorite_table")
+    @Query("SELECT * FROM favorite_table")
     fun getAllFavorite(): LiveData<List<FavoriteItem>>
 
     @Query("SELECT * FROM favorite_table WHERE id= :id")
@@ -36,9 +36,28 @@ interface FilmsDao {
     @Query("UPDATE films_table SET favorite = :isFavorite where id = :id")
     fun setFilms(id: Int, isFavorite: Boolean)
 
+    @Query("UPDATE films_table SET watchLater = :isWatchLater where id = :id")
+    fun setWatchLater(id: Int, isWatchLater: Boolean)
+
     @Update
     fun updateFilms(filmsItem: FilmsItem)
 
     @Update
     fun updateFavorite(favoriteItem: FavoriteItem)
+
+    //WatchLater_table
+    @Query("SELECT * FROM watchLater_table")
+    fun getAllWatchLater(): LiveData<List<WatchLaterItem>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertInWatchLater(film: WatchLaterItem)
+
+    @Delete
+    fun deleteItemWatchLater(watchLaterItem: WatchLaterItem)
+
+    @Query("SELECT * FROM watchLater_table WHERE id= :id")
+    fun getItemWatchLater(id: Int): WatchLaterItem
+
+    @Query ("UPDATE watchLater_table SET dateToWatch = :dateToWatch where id = :id")
+    fun updateTimeToWatch(id: Int, dateToWatch: Long)
 }

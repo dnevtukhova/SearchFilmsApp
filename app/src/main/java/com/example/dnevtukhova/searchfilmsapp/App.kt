@@ -23,6 +23,7 @@ class App : Application() {
         const val PAGE_NUMBER = "page number"
         var favoriteF: Boolean = false
         var listF: Boolean = true
+        var watchLaterF: Boolean = false
     }
 
     lateinit var api: ServerApi

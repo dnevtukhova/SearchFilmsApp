@@ -12,6 +12,7 @@ import com.example.dnevtukhova.searchfilmsapp.App.Companion.CURRENT_DATE
 import com.example.dnevtukhova.searchfilmsapp.App.Companion.PAGE_NUMBER
 import com.example.dnevtukhova.searchfilmsapp.data.FavoriteItem
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.data.WatchLaterItem
 import com.example.dnevtukhova.searchfilmsapp.domain.FilmsInteractor
 import java.util.*
 
@@ -19,6 +20,8 @@ class FilmsListViewModel(private val filmsInteractor: FilmsInteractor) : ViewMod
     private var filmsLiveData: LiveData<List<FilmsItem>>? = filmsInteractor.getFilms()
     private val favoriteLiveData: LiveData<List<FavoriteItem>>? = filmsInteractor.getFavorite()
     private val filmsDetailLiveData = MutableLiveData<FilmsItem>()
+    private val watchLaterLiveData: LiveData<List<WatchLaterItem>>? =
+        filmsInteractor.getWatchLater()
     private val errorLiveData = SingleLiveEvent<String>()
     lateinit var mSettings: SharedPreferences
 
@@ -32,20 +35,24 @@ class FilmsListViewModel(private val filmsInteractor: FilmsInteractor) : ViewMod
     val favoriteFilms: LiveData<List<FavoriteItem>>?
         get() = favoriteLiveData
 
+    val watchLaterFilms: LiveData<List<WatchLaterItem>>?
+        get() = watchLaterLiveData
+
     val filmsDetail: LiveData<FilmsItem>
         get() = filmsDetailLiveData
 
     val error: LiveData<String>
         get() = errorLiveData
 
+    //films
     fun refreshAllFilms() {
         filmsInteractor.getFilms(
             App.API_KEY,
             App.LANGUAGE,
-            mSettings.getInt(PAGE_NUMBER,0),
+            mSettings.getInt(PAGE_NUMBER, 0),
             object : FilmsInteractor.GetFilmsCallback {
                 override fun onSuccess(films: LiveData<List<FilmsItem>>?) {
-                 }
+                }
 
                 override fun onError(error: String) {
                     errorLiveData.postValue(error)
@@ -57,12 +64,13 @@ class FilmsListViewModel(private val filmsInteractor: FilmsInteractor) : ViewMod
         filmsDetailLiveData.postValue(filmsItem)
     }
 
-    fun selectFavorite(filmsItem: FilmsItem) {
-        filmsInteractor.selectFavorite(filmsItem)
-    }
-
     fun removeAllFilms() {
         filmsInteractor.removeAllFilms()
+    }
+
+    //favoriteFilms
+    fun selectFavorite(filmsItem: FilmsItem) {
+        filmsInteractor.selectFavorite(filmsItem)
     }
 
     fun removeFromFavorite(filmsItem: FavoriteItem, favorite: Boolean) {
@@ -73,7 +81,16 @@ class FilmsListViewModel(private val filmsInteractor: FilmsInteractor) : ViewMod
         filmsInteractor.addToFavorite(filmsItem, favorite)
     }
 
-     fun initSharedPref() {
+    //watchLaterFilms
+    fun selectWatchLater(filmsItem: FilmsItem, dateToWatch: Long) {
+        filmsInteractor.selectWatchLater(filmsItem, dateToWatch)
+    }
+
+    fun setDateToWatch(watchLaterItem: WatchLaterItem) {
+        filmsInteractor.setDateToWatch(watchLaterItem)
+    }
+
+    fun initSharedPref() {
         mSettings = App.instance.applicationContext.getSharedPreferences(
             "Settings",
             Context.MODE_PRIVATE
@@ -87,8 +104,9 @@ class FilmsListViewModel(private val filmsInteractor: FilmsInteractor) : ViewMod
                 putLong(CURRENT_DATE, currentDate)
             }
             Log.d(TAG, "обновили SharedPref")
-           mSettings.edit{
-              putInt(PAGE_NUMBER, 1)}
+            mSettings.edit {
+                putInt(PAGE_NUMBER, 1)
+            }
             removeAllFilms()
             refreshAllFilms()
         }

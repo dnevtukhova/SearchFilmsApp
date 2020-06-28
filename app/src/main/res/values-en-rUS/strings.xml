@@ -17,4 +17,6 @@
     <string name="menuLike">Like</string>
     <string name="image">Image</string>
     <string name="all_films">Films</string>
+    <string name="watchLater">Watch Later</string>
+    <string name="reminderWatchFilm">Remind to watch a movie</string>
 </resources>

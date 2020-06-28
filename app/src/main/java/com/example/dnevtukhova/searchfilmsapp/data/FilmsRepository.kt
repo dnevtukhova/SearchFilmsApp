@@ -7,11 +7,14 @@ class FilmsRepository(filmsDb: FilmsDb?) {
     private var filmsDao = filmsDb?.getFilmsDao()
     private var filmsLiveData: LiveData<List<FilmsItem>>? = filmsDao?.getFilms()
     private var favoriteLiveData: LiveData<List<FavoriteItem>>? = filmsDao?.getAllFavorite()
+    private var watchLaterLiveData: LiveData<List<WatchLaterItem>>? = filmsDao?.getAllWatchLater()
 
     val films: LiveData<List<FilmsItem>>?
         get() = filmsLiveData
     val favoriteFilms: LiveData<List<FavoriteItem>>?
         get() = favoriteLiveData
+    val watchLaterFilms: LiveData<List<WatchLaterItem>>?
+        get() = watchLaterLiveData
 
     fun addToCache(films: List<FilmsItem>) {
         Executors.newSingleThreadExecutor().execute {
@@ -36,7 +39,6 @@ class FilmsRepository(filmsDb: FilmsDb?) {
         }
     }
 
-
     fun removeFromFavorite(itemFilm: FavoriteItem) {
         Executors.newSingleThreadExecutor().execute {
             filmsDao?.deleteItemFavorite(itemFilm)
@@ -49,7 +51,7 @@ class FilmsRepository(filmsDb: FilmsDb?) {
         }
     }
 
-    fun setFilms(itemFilm: FavoriteItem, favorite: Boolean) {
+    fun setFavorite(itemFilm: FavoriteItem, favorite: Boolean) {
         Executors.newSingleThreadExecutor().execute {
             filmsDao?.setFilms(itemFilm.id, favorite)
         }
@@ -57,6 +59,30 @@ class FilmsRepository(filmsDb: FilmsDb?) {
 
     fun removeAllFilms() {
         filmsDao?.removeAllFilms()
+    }
+
+    //watchLater
+
+    fun addToWatchLater(itemFilm: WatchLaterItem) {
+        Executors.newSingleThreadExecutor().execute {
+            filmsDao?.insertInWatchLater(itemFilm)
+        }
+    }
+
+    fun removeFromWatchLater(itemFilm: WatchLaterItem) {
+        Executors.newSingleThreadExecutor().execute {
+            filmsDao?.deleteItemWatchLater(itemFilm)
+        }
+    }
+
+    fun getItemWatchLater(id: Int): WatchLaterItem? {
+        return filmsDao?.getItemWatchLater(id)
+    }
+
+    fun setDateToWatch(itemFilm: WatchLaterItem) {
+        Executors.newSingleThreadExecutor().execute() {
+            filmsDao?.updateTimeToWatch(itemFilm.id, itemFilm.dateToWatch)
+        }
     }
 }
 
