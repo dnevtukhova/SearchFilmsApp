@@ -121,7 +121,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         calendar.set(Calendar.MONTH, p2)
         calendar.set(Calendar.DAY_OF_MONTH, p3)
         val timePickerDialog = TimePickerDialog(
-            context, this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE),
+            context, this, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE),
             true
         )
         timePickerDialog.show()

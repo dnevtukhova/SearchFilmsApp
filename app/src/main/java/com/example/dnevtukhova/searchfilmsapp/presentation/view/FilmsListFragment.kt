@@ -134,18 +134,28 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                     @RequiresApi(Build.VERSION_CODES.M)
                     override fun onWatchLaterClick(filmsItem: FilmsItem, position: Int) {
                         intent = createIntent(filmsItem)
-                        if(filmsItem.watchLater) {
-                        myFilmsItem = filmsItem
-                        myPosition = position
-                        selectDateAndTime()
+                        if (filmsItem.watchLater) {
+                            myFilmsItem = filmsItem
+                            myPosition = position
+                            selectDateAndTime()
                         } else {
-                           filmsViewModel.selectWatchLater(filmsItem, Calendar.getInstance().timeInMillis)
-                            pIntentOnce = PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT)
-                            am?.setExact(
-                                AlarmManager.RTC_WAKEUP,
-                                dateNotification!!,
-                                pIntentOnce
+                            filmsViewModel.selectWatchLater(
+                                filmsItem,
+                                Calendar.getInstance().timeInMillis
                             )
+                            if (pIntentOnce != null) {
+                                pIntentOnce = PendingIntent.getBroadcast(
+                                    requireContext(),
+                                    0,
+                                    intent,
+                                    PendingIntent.FLAG_CANCEL_CURRENT
+                                )
+                                am?.setExact(
+                                    AlarmManager.RTC_WAKEUP,
+                                    dateNotification!!,
+                                    pIntentOnce
+                                )
+                            }
                         }
                     }
                 })
@@ -314,14 +324,14 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         calendar.set(Calendar.MONTH, p2)
         calendar.set(Calendar.DAY_OF_MONTH, p3)
         val timePickerDialog = TimePickerDialog(
-            context, this, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE),
+            context, this, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE),
             true
         )
         timePickerDialog.show()
     }
 
     override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
-        calendar.set(Calendar.HOUR, p1)
+        calendar.set(Calendar.HOUR_OF_DAY, p1)
         calendar.set(Calendar.MINUTE, p2)
         setAlarm()
     }
@@ -332,7 +342,12 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         filmsViewModel.selectWatchLater(myFilmsItem!!, dateNotification!!)
         adapterFilms.notifyItemChanged(myPosition!!)
         pIntentOnce =
-            PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getBroadcast(
+                requireContext(),
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
         am?.setExact(
             AlarmManager.RTC_WAKEUP,
             dateNotification!!,
@@ -341,7 +356,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     }
 
     fun createIntent(filmsItem: FilmsItem): Intent {
-        val intent = Intent("${filmsItem.id}",null, context, Receiver::class.java)
+        val intent = Intent("${filmsItem.id}", null, context, Receiver::class.java)
         val bundle = Bundle()
         bundle.putParcelable(FILMS_ITEM_EXTRA, filmsItem)
         intent.putExtra(BUNDLE, bundle)

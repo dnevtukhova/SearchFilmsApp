@@ -2,6 +2,8 @@ package com.example.dnevtukhova.searchfilmsapp
 
 import android.app.Application
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsDb
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsRepository
 import com.example.dnevtukhova.searchfilmsapp.data.ServerApi
@@ -30,6 +32,19 @@ class App : Application() {
     lateinit var filmsInteractor: FilmsInteractor
     private lateinit var filmsRepository: FilmsRepository
     private var INSTANCE: FilmsDb? = null
+    private val MIGRATION_1_2 = object: Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE 'watchLater_table' ( 'id' INTEGER, " +
+                    "'title' TEXT, " +
+                    "'description' TEXT, " +
+                    "'image' TEXT, " +
+                    "'favorite' INTEGER, " +
+                    "'watchLater' INTEGER, " +
+                    " 'dateToWatch' INTEGER, " +
+                    "PRIMARY KEY('id'))")
+            database.execSQL("ALTER TABLE films_table ADD COLUMN watchLater DEFAULT 1 NOT NULL")
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -73,6 +88,7 @@ class App : Application() {
 
                 )
                     .allowMainThreadQueries()
+                    .addMigrations(MIGRATION_1_2)
                     .build()
             }
         }
