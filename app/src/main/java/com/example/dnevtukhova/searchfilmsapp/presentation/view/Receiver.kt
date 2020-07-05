@@ -29,7 +29,9 @@ class Receiver : BroadcastReceiver() {
             .setStyle(NotificationCompat.BigTextStyle().bigText(filmsItem.description))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
+
+        val notificationId = System.currentTimeMillis().toInt()
         val notificationManager = NotificationManagerCompat.from(context)
-        notificationManager.notify(2, builder.build())
+        notificationManager.notify(notificationId, builder.build())
     }
 }

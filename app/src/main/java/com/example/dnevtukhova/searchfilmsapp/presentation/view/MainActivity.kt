@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity(),
             setTheme(R.style.DarkTheme)
         }
         filmsItem = intent.getParcelableExtra(FILM_FROM_NOTIFICATION)
+        Log.d("TAG", filmsItem.toString())
         Log.d(TAG, "filmsItem $filmsItem")
         openFragment(filmsItem)
         setBottomNavigation()
