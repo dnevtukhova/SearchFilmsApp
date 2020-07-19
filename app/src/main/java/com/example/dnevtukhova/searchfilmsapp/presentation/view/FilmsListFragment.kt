@@ -127,6 +127,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                     }
 
                     override fun onFavouriteClick(filmsItem: FilmsItem, position: Int) {
+                        Log.d(TAG, "${filmsItem.id} ${filmsItem.title} ${filmsItem.description} ${filmsItem.image}")
                         filmsViewModel.selectFavorite(filmsItem)
                         adapterFilms.notifyItemChanged(position)
                     }

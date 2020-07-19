@@ -16,6 +16,7 @@ import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.FavoriteItem
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.iid.FirebaseInstanceId
 
 class MainActivity : AppCompatActivity(),
     FilmsListFragment.FilmsListListener,
@@ -35,9 +36,15 @@ class MainActivity : AppCompatActivity(),
             setTheme(R.style.DarkTheme)
         }
         filmsItem = intent.getParcelableExtra(FILM_FROM_NOTIFICATION)
+        Log.d("TAG", filmsItem.toString())
         Log.d(TAG, "filmsItem $filmsItem")
         openFragment(filmsItem)
         setBottomNavigation()
+
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            val newToken: String = it.token
+            Log.d("newToken", newToken)
+        }
     }
 
     override fun onBackPressed() {
