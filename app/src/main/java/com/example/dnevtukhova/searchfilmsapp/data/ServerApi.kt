@@ -1,6 +1,6 @@
 package com.example.dnevtukhova.searchfilmsapp.data
 
-import retrofit2.Call
+import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -10,5 +10,5 @@ interface ServerApi {
         @Query("api_key") key: String,
         @Query("language") language: String,
         @Query("page") page: Int
-    ): Call<PopularFilms>
+    ): Single <PopularFilms>
 }

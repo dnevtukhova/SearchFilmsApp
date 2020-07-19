@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Поиск Фильмов</string>
-    <string name="name_film_shining">Сияние</string>
-    <string name="name_film_cloud_atlas">Облачный Атлас</string>
     <string name="details">Детали</string>
     <string name="invite_friend">Пригласить друга</string>
     <string name="invite">Дорогой друг, приглашаю тебя оценить мое приложение Search Films</string>

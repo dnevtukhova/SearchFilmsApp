@@ -77,7 +77,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         val recycler = view.findViewById<RecyclerView>(R.id.recyclerViewWatchLater)
         adapterWatchLaterFilms =
             FilmsWatchLaterAdapter(
-                context!!,
+                requireContext(),
                 LayoutInflater.from(context),
                 //по долгому клику удаление элемента
                 object :
@@ -94,7 +94,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         recycler.adapter = adapterWatchLaterFilms
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         AppCompatResources.getDrawable(
-            context!!,
+            requireContext(),
             R.drawable.white_line
         )
             ?.let { itemDecoration.setDrawable(it) }
@@ -105,7 +105,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     @RequiresApi(Build.VERSION_CODES.M)
     fun selectDateAndTime() {
         val datePickerDialog = DatePickerDialog(
-            context!!,
+            requireContext(),
             this,
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),

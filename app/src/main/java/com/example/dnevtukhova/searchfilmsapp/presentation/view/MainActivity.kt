@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity(),
         FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
             val newToken: String = it.token
             Log.d("newToken", newToken)
+            println(newToken)
         }
     }
 
@@ -78,6 +80,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun showExitDialog() {
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.custom_dialog)
@@ -152,6 +155,7 @@ class MainActivity : AppCompatActivity(),
         bar.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.film_favorite -> {
+                    supportActionBar?.show()
                     App.favoriteF = true
                     App.listF = false
                     App.watchLaterF = false
@@ -178,6 +182,7 @@ class MainActivity : AppCompatActivity(),
                         .commit()
                 }
                 R.id.filmsWatchLater -> {
+                    supportActionBar?.show()
                     App.listF = false
                     App.favoriteF = false
                     App.watchLaterF = true

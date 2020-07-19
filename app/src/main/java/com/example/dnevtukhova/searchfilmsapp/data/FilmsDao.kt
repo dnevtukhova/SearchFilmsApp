@@ -1,13 +1,12 @@
 package com.example.dnevtukhova.searchfilmsapp.data
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
-
+import io.reactivex.Flowable
 
 @Dao
 interface FilmsDao {
     @Query("SELECT * FROM films_table")
-    fun getFilms(): LiveData<List<FilmsItem>>
+    fun getFilms(): Flowable<List<FilmsItem>>
 
     @Insert (onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(films: List<FilmsItem>)
@@ -16,7 +15,7 @@ interface FilmsDao {
     fun removeAllFilms()
 
     @Query("SELECT * FROM favorite_table")
-    fun getAllFavorite(): LiveData<List<FavoriteItem>>
+    fun getAllFavorite(): Flowable<List<FavoriteItem>>
 
     @Query("SELECT * FROM favorite_table WHERE id= :id")
     fun getItemFavorite(id: Int): FavoriteItem
@@ -47,7 +46,7 @@ interface FilmsDao {
 
     //WatchLater_table
     @Query("SELECT * FROM watchLater_table")
-    fun getAllWatchLater(): LiveData<List<WatchLaterItem>>
+    fun getAllWatchLater(): Flowable<List<WatchLaterItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertInWatchLater(film: WatchLaterItem)

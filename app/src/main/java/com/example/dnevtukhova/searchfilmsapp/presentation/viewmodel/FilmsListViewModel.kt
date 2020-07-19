@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.LiveDataReactiveStreams
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.dnevtukhova.searchfilmsapp.App
@@ -14,14 +15,22 @@ import com.example.dnevtukhova.searchfilmsapp.data.FavoriteItem
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
 import com.example.dnevtukhova.searchfilmsapp.data.WatchLaterItem
 import com.example.dnevtukhova.searchfilmsapp.domain.FilmsInteractor
+import io.reactivex.Flowable
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 class FilmsListViewModel(private val filmsInteractor: FilmsInteractor) : ViewModel() {
-    private var filmsLiveData: LiveData<List<FilmsItem>>? = filmsInteractor.getFilms()
-    private val favoriteLiveData: LiveData<List<FavoriteItem>>? = filmsInteractor.getFavorite()
+    private var filmsLiveData: LiveData<List<FilmsItem>> =
+        LiveDataReactiveStreams.fromPublisher(filmsInteractor.getFilms()!!.subscribeOn(Schedulers.io()))
+    private val favoriteLiveData: LiveData<List<FavoriteItem>>? =
+        LiveDataReactiveStreams.fromPublisher(filmsInteractor.getFavorite()!!.subscribeOn(Schedulers.io()))
     private val filmsDetailLiveData = MutableLiveData<FilmsItem>()
     private val watchLaterLiveData: LiveData<List<WatchLaterItem>>? =
-        filmsInteractor.getWatchLater()
+        LiveDataReactiveStreams.fromPublisher(
+            filmsInteractor.getWatchLater()!!.subscribeOn(
+                Schedulers.io()
+            )
+        )
     private val errorLiveData = SingleLiveEvent<String>()
     lateinit var mSettings: SharedPreferences
 
@@ -51,7 +60,7 @@ class FilmsListViewModel(private val filmsInteractor: FilmsInteractor) : ViewMod
             App.LANGUAGE,
             mSettings.getInt(PAGE_NUMBER, 0),
             object : FilmsInteractor.GetFilmsCallback {
-                override fun onSuccess(films: LiveData<List<FilmsItem>>?) {
+                override fun onSuccess(films: Flowable<List<FilmsItem>>?) {
                 }
 
                 override fun onError(error: String) {
