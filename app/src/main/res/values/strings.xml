@@ -16,4 +16,9 @@
     <string name="menuLike">Избранное</string>
     <string name="image">Картинка</string>
     <string name="all_films">Фильмы</string>
+    <string name="watchlaterimage" translatable="false">watchLaterImage</string>
+    <string name="watchLater">Посмотреть позже</string>
+    <string name="channelName" translatable="false">Films Channel</string>
+    <string name="channelDescription" translatable="false">Films Channel description</string>
+    <string name="reminderWatchFilm">Напомнить посмотреть фильм:</string>
 </resources>

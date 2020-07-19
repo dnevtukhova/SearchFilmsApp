@@ -42,6 +42,16 @@
         app:layout_constraintTop_toBottomOf="@id/titleTv"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="Писатель Джек Торренс (Джек Николсон) с женой и сыном Денни         приезжает в отель Оверлок, расположенный на снежных вершинах Колорадо. Роскошный интерьер         гостиницы, затерянной в белом одиночестве, нагромождение залов, симметричных коридоров,         головоломка лабиринта. Так начинается фильм «Сияние» (1979 г.) по роману Стивена Кинга."/>
+    <ImageView
+        android:id="@+id/watchLater"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintRight_toLeftOf="@id/imageFavourite"
+        app:layout_constraintTop_toBottomOf="@id/descriptionFilm"
+        tools:src="@drawable/ic_notifications_none_black_24dp"
+        android:contentDescription="@string/watchlaterimage" />
 
     <ImageView
         android:id="@+id/imageFavourite"
@@ -50,6 +60,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         tools:src="@drawable/ic_favorite_border_black_24dp"
+        app:layout_constraintLeft_toRightOf="@id/watchLater"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/descriptionFilm"/>
 

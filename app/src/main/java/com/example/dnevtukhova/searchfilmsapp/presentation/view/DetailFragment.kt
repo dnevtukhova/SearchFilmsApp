@@ -2,6 +2,7 @@ package com.example.dnevtukhova.searchfilmsapp.presentation.view
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -40,11 +41,18 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val bundle = arguments
+        val filmsItem: FilmsItem? = bundle?.getParcelable("key")
+
         val myViewModelFactory = FilmsViewModelFactory(App.instance.filmsInteractor)
         detailViewViewModel = ViewModelProvider(
             requireActivity(),
             myViewModelFactory
         ).get(FilmsListViewModel::class.java)
+        Log.d(TAG, "filmsItem $filmsItem")
+        if (filmsItem != null) {
+            detailViewViewModel.selectFilm(filmsItem)
+        }
         detailViewViewModel.filmsDetail.observe(
             this.viewLifecycleOwner,
             Observer<FilmsItem> { filmsDetail ->
@@ -77,6 +85,14 @@ class DetailFragment : Fragment() {
         const val TAG = "DetailFragment"
         fun newInstance(): DetailFragment {
             return DetailFragment()
+        }
+
+        fun newInstance(filmsItem: FilmsItem): DetailFragment {
+            val detailFragment = DetailFragment()
+            val bundle = Bundle()
+            bundle.putParcelable("key", filmsItem)
+            detailFragment.arguments = bundle
+            return detailFragment
         }
     }
 }
