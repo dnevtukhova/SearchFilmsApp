@@ -17,7 +17,7 @@ import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.FavoriteItem
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.iid.FirebaseInstanceId
+
 
 class MainActivity : AppCompatActivity(),
     FilmsListFragment.FilmsListListener,
@@ -41,12 +41,6 @@ class MainActivity : AppCompatActivity(),
         Log.d(TAG, "filmsItem $filmsItem")
         openFragment(filmsItem)
         setBottomNavigation()
-
-        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
-            val newToken: String = it.token
-            Log.d("newToken", newToken)
-            println(newToken)
-        }
     }
 
     override fun onBackPressed() {
