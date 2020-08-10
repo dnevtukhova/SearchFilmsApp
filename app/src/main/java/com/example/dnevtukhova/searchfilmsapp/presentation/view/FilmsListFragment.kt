@@ -117,7 +117,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         adapterFilms =
             FilmsAdapter(
                 progressBar,
-                context!!,
+                requireContext(),
                 LayoutInflater.from(context),
                 object :
                     FilmsAdapter.OnFilmsClickListener {
@@ -185,7 +185,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         getDrawable(
-            context!!,
+            requireContext(),
             R.drawable.white_line
         )?.let { itemDecoration.setDrawable(it) }
         recycler.addItemDecoration(itemDecoration)
@@ -194,11 +194,11 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     private fun addSnackBar(error: String) {
         // Создание экземпляра Snackbar
         val snackBar =
-            Snackbar.make(view!!, "Ошибка $error", Snackbar.LENGTH_LONG)
+            Snackbar.make(requireView(), "Ошибка $error", Snackbar.LENGTH_LONG)
         // Устанавливаем цвет текста кнопки действий
         snackBar.setActionTextColor(
             ContextCompat.getColor(
-                context!!,
+                requireContext(),
                 R.color.colorRed
             )
         )
@@ -207,7 +207,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         // Изменение цвета текста
         val snackbarTextId = com.google.android.material.R.id.snackbar_text
         val textView = snackBarView.findViewById<View>(snackbarTextId) as TextView
-        textView.setTextColor(ContextCompat.getColor(context!!, android.R.color.white))
+        textView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
         // Изменение цвета фона
         snackBarView.setBackgroundColor(Color.GRAY)
         snackBar.setAnchorView(R.id.bottomNavigation)
@@ -309,7 +309,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     @RequiresApi(Build.VERSION_CODES.M)
     fun selectDateAndTime() {
         val datePickerDialog = DatePickerDialog(
-            context!!,
+            requireContext(),
             this,
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -372,7 +372,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             val channel = NotificationChannel(CHANNEL_ID, name, importance)
             channel.description = description
 
-            val notificationManager = activity!!.getSystemService(NotificationManager::class.java)
+            val notificationManager = requireActivity().getSystemService(NotificationManager::class.java)
             notificationManager!!.createNotificationChannel(channel)
         }
     }

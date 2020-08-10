@@ -12,6 +12,7 @@ import com.squareup.picasso.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class App : Application() {
@@ -68,6 +69,7 @@ class App : Application() {
         api = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(client)
             .build()
             .create(ServerApi::class.java)
@@ -87,7 +89,7 @@ class App : Application() {
                     "films_database"
 
                 )
-                    .allowMainThreadQueries()
+                  //  .allowMainThreadQueries()
                     .addMigrations(MIGRATION_1_2)
                     .build()
             }

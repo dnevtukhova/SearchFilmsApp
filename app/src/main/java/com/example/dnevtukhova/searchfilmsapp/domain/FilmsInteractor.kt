@@ -1,10 +1,10 @@
 package com.example.dnevtukhova.searchfilmsapp.domain
 
-import androidx.lifecycle.LiveData
+import android.annotation.SuppressLint
 import com.example.dnevtukhova.searchfilmsapp.data.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import io.reactivex.Flowable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 
 class FilmsInteractor(
     private val serverApi: ServerApi,
@@ -12,13 +12,15 @@ class FilmsInteractor(
 
 ) {
     fun getFilms(key: String, language: String, page: Int, callback: GetFilmsCallback) {
-
-        serverApi.getFilms(key, language, page).enqueue(object : Callback<PopularFilms> {
-            override fun onResponse(call: Call<PopularFilms>, response: Response<PopularFilms>) {
-                if (response.isSuccessful) {
+        serverApi.getFilms(key, language, page)
+            .subscribeOn(Schedulers.computation())
+            .observeOn(Schedulers.newThread())
+            .subscribe(object : DisposableSingleObserver<PopularFilms>() {
+                override fun onSuccess(t: PopularFilms) {
+                    println("вошли в метод onSucsess")
                     val filmsList = mutableListOf<FilmsItem>()
-                    response.body()?.results
-                        ?.forEach {
+                    t.results
+                        .forEach {
                             filmsList.add(
                                 FilmsItem(
                                     it.id,
@@ -30,33 +32,31 @@ class FilmsInteractor(
                                 )
                             )
                         }
+
                     filmsRepository.addToCache(filmsList)
-
                     callback.onSuccess(filmsRepository.films)
-                } else {
-                    callback.onError("!!! произошла ошибка ${response.code()}")
                 }
-            }
 
-            override fun onFailure(call: Call<PopularFilms>, t: Throwable) {
-                callback.onError("!!! произошла ошибка $t")
-            }
-        })
+                override fun onError(e: Throwable) {
+                    callback.onError("!!! произошла ошибка $e")
+                }
+            })
     }
 
-    fun getFilms(): LiveData<List<FilmsItem>>? {
+    fun getFilms(): Flowable<List<FilmsItem>>? {
         return filmsRepository.films
     }
 
-    fun getFavorite(): LiveData<List<FavoriteItem>>? {
+    fun getFavorite(): Flowable<List<FavoriteItem>>? {
         return filmsRepository.favoriteFilms
     }
 
     interface GetFilmsCallback {
-        fun onSuccess(films: LiveData<List<FilmsItem>>?)
+        fun onSuccess(films: Flowable<List<FilmsItem>>?)
         fun onError(error: String)
     }
 
+    @SuppressLint("CheckResult")
     private fun isFavorite(id: Int): Boolean {
         var isLike = true
         if (filmsRepository.getItemFavorite(id) != null) {
@@ -102,7 +102,7 @@ class FilmsInteractor(
 
     //watchLater
 
-    fun getWatchLater(): LiveData<List<WatchLaterItem>>? {
+    fun getWatchLater(): Flowable<List<WatchLaterItem>>? {
         return filmsRepository.watchLaterFilms
     }
 
@@ -122,7 +122,11 @@ class FilmsInteractor(
             filmsRepository.setFilms(filmsItem)
             filmsRepository.addToWatchLater(w)
         } else {
-            filmsRepository.removeFromWatchLater(filmsRepository.getItemWatchLater(filmsItem.id)!!)
+            filmsRepository.removeFromWatchLater(
+                filmsRepository.getItemWatchLater(
+                    filmsItem.id
+                )!!
+            )
             filmsItem.watchLater = true
             filmsRepository.setFilms(filmsItem)
         }

@@ -1,78 +1,97 @@
 package com.example.dnevtukhova.searchfilmsapp.data
 
-import androidx.lifecycle.LiveData
-import java.util.concurrent.Executors
+import io.reactivex.Completable
+import io.reactivex.Flowable
+import io.reactivex.schedulers.Schedulers
 
 class FilmsRepository(filmsDb: FilmsDb?) {
     private var filmsDao = filmsDb?.getFilmsDao()
-    private var filmsLiveData: LiveData<List<FilmsItem>>? = filmsDao?.getFilms()
-    private var favoriteLiveData: LiveData<List<FavoriteItem>>? = filmsDao?.getAllFavorite()
-    private var watchLaterLiveData: LiveData<List<WatchLaterItem>>? = filmsDao?.getAllWatchLater()
+    private var filmsData: Flowable<List<FilmsItem>>? = filmsDao?.getFilms()
+    private var favoriteData: Flowable<List<FavoriteItem>>? = filmsDao?.getAllFavorite()
+    private var watchLaterData: Flowable<List<WatchLaterItem>>? = filmsDao?.getAllWatchLater()
 
-    val films: LiveData<List<FilmsItem>>?
-        get() = filmsLiveData
-    val favoriteFilms: LiveData<List<FavoriteItem>>?
-        get() = favoriteLiveData
-    val watchLaterFilms: LiveData<List<WatchLaterItem>>?
-        get() = watchLaterLiveData
+    val films: Flowable<List<FilmsItem>>?
+        get() = filmsData
+    val favoriteFilms: Flowable<List<FavoriteItem>>?
+        get() = favoriteData
+    val watchLaterFilms: Flowable<List<WatchLaterItem>>?
+        get() = watchLaterData
 
     fun addToCache(films: List<FilmsItem>) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromRunnable {
             filmsDao?.insertAll(films)
         }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
-    fun getItemFavorite(id: Int): FavoriteItem? {
-        return filmsDao?.getItemFavorite(id)
-    }
+    fun getItemFavorite(id: Int): FavoriteItem? = filmsDao?.getItemFavorite(id)
 
     fun addToFavorite(favoriteItem: FavoriteItem, isFavorite: Boolean) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromRunnable {
             filmsDao?.insertInFavorite(favoriteItem)
             filmsDao?.updateIsFavorite(favoriteItem.id, isFavorite)
         }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
     fun addToFavorite(itemFilm: FavoriteItem) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromRunnable {
             filmsDao?.insertInFavorite(itemFilm)
         }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
     fun removeFromFavorite(itemFilm: FavoriteItem) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromRunnable {
             filmsDao?.deleteItemFavorite(itemFilm)
         }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
     fun setFilms(itemFilm: FilmsItem) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromRunnable {
             filmsDao?.updateFilms(itemFilm)
         }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
     fun setFavorite(itemFilm: FavoriteItem, favorite: Boolean) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromRunnable {
             filmsDao?.setFilms(itemFilm.id, favorite)
         }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
     fun removeAllFilms() {
-        filmsDao?.removeAllFilms()
+        Completable.fromRunnable {
+            filmsDao?.removeAllFilms()
+        }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
     //watchLater
 
     fun addToWatchLater(itemFilm: WatchLaterItem) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromRunnable {
             filmsDao?.insertInWatchLater(itemFilm)
         }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
     fun removeFromWatchLater(itemFilm: WatchLaterItem) {
-        Executors.newSingleThreadExecutor().execute {
+        Completable.fromRunnable {
             filmsDao?.deleteItemWatchLater(itemFilm)
         }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 
     fun getItemWatchLater(id: Int): WatchLaterItem? {
@@ -80,9 +99,11 @@ class FilmsRepository(filmsDb: FilmsDb?) {
     }
 
     fun setDateToWatch(itemFilm: WatchLaterItem) {
-        Executors.newSingleThreadExecutor().execute() {
+        Completable.fromRunnable {
             filmsDao?.updateTimeToWatch(itemFilm.id, itemFilm.dateToWatch)
         }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
     }
 }
 

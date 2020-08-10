@@ -20,6 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/yes"
+            android:textColor="@color/colorWhite"
             android:layout_margin="20dp"
             android:padding="20dp"/>
         <Button
@@ -27,6 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/no"
+            android:textColor="@color/colorWhite"
             android:layout_margin="20dp"
             android:padding="20dp"/>
     </LinearLayout>
