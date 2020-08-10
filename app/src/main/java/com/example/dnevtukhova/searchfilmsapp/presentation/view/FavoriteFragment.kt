@@ -1,7 +1,6 @@
 package com.example.dnevtukhova.searchfilmsapp.presentation.view
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -62,7 +60,7 @@ class FavoriteFragment : Fragment() {
         val recycler = view.findViewById<RecyclerView>(R.id.recyclerViewFavorite)
         adapterFavoriteFilms =
             FilmsFavoriteAdapter(
-                context!!,
+                requireContext(),
                 LayoutInflater.from(context),
                 //по долгому клику удаление элемента
                 object :
@@ -72,7 +70,10 @@ class FavoriteFragment : Fragment() {
                         position: Int
                     ): Boolean {
                         favoriteViewModel.removeFromFavorite(filmsItem, true)
-                        addSnackBar(filmsItem)
+                        requireView().showSnackbar("Удален фильм '${filmsItem.title}'", Snackbar.LENGTH_LONG, "Отменить") {
+                            favoriteViewModel.addToFavorite(filmsItem, false)
+                            adapterFavoriteFilms.notifyDataSetChanged()
+                        }
                         adapterFavoriteFilms.notifyDataSetChanged()
                         return true
                     }
@@ -94,38 +95,11 @@ class FavoriteFragment : Fragment() {
         recycler.adapter = adapterFavoriteFilms
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         AppCompatResources.getDrawable(
-            context!!,
+            requireContext(),
             R.drawable.white_line
         )
             ?.let { itemDecoration.setDrawable(it) }
         recycler.addItemDecoration(itemDecoration)
-    }
-
-    private fun addSnackBar(filmsItem: FavoriteItem) {
-        // Создание экземпляра Snackbar
-        val snackBar =
-            Snackbar.make(view!!, "Удален фильм '${filmsItem.title}'", Snackbar.LENGTH_LONG)
-        // Устанавливаем цвет текста кнопки действий
-        snackBar.setActionTextColor(
-            ContextCompat.getColor(
-                context!!,
-                R.color.colorRed
-            )
-        )
-        // Получение snackbar
-        val snackBarView = snackBar.view
-        // Изменение цвета текста
-        val snackbarTextId = com.google.android.material.R.id.snackbar_text
-        val textView = snackBarView.findViewById<View>(snackbarTextId) as TextView
-        textView.setTextColor(ContextCompat.getColor(context!!, android.R.color.white))
-        // Изменение цвета фона
-        snackBarView.setBackgroundColor(Color.GRAY)
-        snackBar.setAnchorView(R.id.bottomNavigation)
-        snackBar.setAction("Отменить") {
-            favoriteViewModel.addToFavorite(filmsItem, false)
-            adapterFavoriteFilms.notifyDataSetChanged()
-        }
-            .show()
     }
 
     //region adapter and holder

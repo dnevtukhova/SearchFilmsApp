@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -16,7 +15,6 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
@@ -89,7 +87,9 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                 if (progressbar != null) {
                     progressbar.visibility = View.GONE
                 }
-                addSnackBar(error)
+                requireView().showSnackbar("Ошибка $error", Snackbar.LENGTH_LONG, "Обновить") {
+                    filmsViewModel.refreshAllFilms()
+                }
             })
         swipeRefreshLayout.setOnRefreshListener {
             if (progressbar != null) {
@@ -189,32 +189,6 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             R.drawable.white_line
         )?.let { itemDecoration.setDrawable(it) }
         recycler.addItemDecoration(itemDecoration)
-    }
-
-    private fun addSnackBar(error: String) {
-        // Создание экземпляра Snackbar
-        val snackBar =
-            Snackbar.make(requireView(), "Ошибка $error", Snackbar.LENGTH_LONG)
-        // Устанавливаем цвет текста кнопки действий
-        snackBar.setActionTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.colorRed
-            )
-        )
-        // Получение snackbar
-        val snackBarView = snackBar.view
-        // Изменение цвета текста
-        val snackbarTextId = com.google.android.material.R.id.snackbar_text
-        val textView = snackBarView.findViewById<View>(snackbarTextId) as TextView
-        textView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-        // Изменение цвета фона
-        snackBarView.setBackgroundColor(Color.GRAY)
-        snackBar.setAnchorView(R.id.bottomNavigation)
-        snackBar.setAction("Обновить") {
-            filmsViewModel.refreshAllFilms()
-        }
-            .show()
     }
 
     interface FilmsListListener {
