@@ -22,13 +22,5 @@
             </intent-filter>
         </activity>
         <receiver android:name=".presentation.view.Receiver" />
-<!--        <service-->
-<!--            android:name="com.example.dnevtukhova.searchfilmsapp.services.FilmsService"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="false">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="com.google.firebase.MESSAGING_EVENT" />-->
-<!--            </intent-filter>-->
-<!--        </service>-->
     </application>
 </manifest>

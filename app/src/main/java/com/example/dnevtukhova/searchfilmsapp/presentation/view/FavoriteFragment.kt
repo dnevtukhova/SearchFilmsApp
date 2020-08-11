@@ -19,16 +19,18 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
-import com.example.dnevtukhova.searchfilmsapp.data.FavoriteItem
-import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
-import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsListViewModel
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
+import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.DetailFragmentViewModel
+import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FavoriteFragmentViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
 
 class FavoriteFragment : Fragment() {
     var listener: FilmsFavoriteAdapter.OnFavoriteFilmsClickListener? = null
-    private lateinit var favoriteViewModel: FilmsListViewModel
+    private lateinit var favoriteViewModel: FavoriteFragmentViewModel
+    private lateinit var detailViewModel: DetailFragmentViewModel
     private lateinit var adapterFavoriteFilms: FilmsFavoriteAdapter
 
     companion object {
@@ -50,10 +52,15 @@ class FavoriteFragment : Fragment() {
         favoriteViewModel = ViewModelProvider(
             requireActivity(),
             myViewModelFactory
-        ).get(FilmsListViewModel::class.java)
+        ).get(FavoriteFragmentViewModel::class.java)
         favoriteViewModel.favoriteFilms?.observe(
             this.viewLifecycleOwner,
-            Observer<List<FavoriteItem>> { films -> adapterFavoriteFilms.setItems(films) })
+            Observer<List<FilmsItem>> { films -> adapterFavoriteFilms.setItems(films) })
+
+        detailViewModel = ViewModelProvider(
+            requireActivity(),
+            myViewModelFactory
+        ).get(DetailFragmentViewModel::class.java)
     }
 
     private fun initRecycler(view: View) {
@@ -66,31 +73,27 @@ class FavoriteFragment : Fragment() {
                 object :
                     FilmsFavoriteAdapter.OnFavoriteFilmsClickListener {
                     override fun onFavoriteFilmsLongClick(
-                        filmsItem: FavoriteItem,
+                        filmsItem: FilmsItem,
                         position: Int
                     ): Boolean {
-                        favoriteViewModel.removeFromFavorite(filmsItem, true)
-                        requireView().showSnackbar("Удален фильм '${filmsItem.title}'", Snackbar.LENGTH_LONG, "Отменить") {
-                            favoriteViewModel.addToFavorite(filmsItem, false)
+                        favoriteViewModel.changeFavorite(filmsItem, true)
+                        requireView().showSnackbar(
+                            "Удален фильм '${filmsItem.title}'",
+                            Snackbar.LENGTH_LONG,
+                            "Отменить"
+                        ) {
+                            favoriteViewModel.changeFavorite(filmsItem, false)
                             adapterFavoriteFilms.notifyDataSetChanged()
                         }
                         adapterFavoriteFilms.notifyDataSetChanged()
                         return true
                     }
 
-                    override fun onFavoriteFilmsFClick(filmsItem: FavoriteItem, position: Int) {
-                        val f = FilmsItem(
-                            filmsItem.id,
-                            filmsItem.title,
-                            filmsItem.description,
-                            filmsItem.image,
-                            filmsItem.favorite,
-                            filmsItem.watchLater
-                        )
-                        favoriteViewModel.selectFilm(f)
-                      listener?.onFavoriteFilmsFClick(filmsItem, position)
+                    override fun onFavoriteFilmsFClick(filmsItem: FilmsItem, position: Int) {
+                        detailViewModel.selectFilm(filmsItem)
+                        listener?.onFavoriteFilmsFClick(filmsItem, position)
                         adapterFavoriteFilms.notifyItemChanged(position)
-                     }
+                    }
                 })
         recycler.adapter = adapterFavoriteFilms
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
@@ -109,11 +112,11 @@ class FavoriteFragment : Fragment() {
         private val imageFilm: ImageView = itemView.findViewById(R.id.image)
         var container: ConstraintLayout = itemView.findViewById(R.id.container)
 
-        fun bind(item: FavoriteItem) {
+        fun bind(item: FilmsItem) {
             titleTv.text = item.title
             subtitleTv.text = item.description
             Glide.with(imageFilm.context)
-                .load(FilmsListFragment.PICTURE + item.image)
+                .load(PICTURE + item.image)
                 .placeholder(R.drawable.ic_photo_black_24dp)
                 .error(R.drawable.ic_error_outline_black_24dp)
                 .centerCrop()
@@ -128,9 +131,9 @@ class FavoriteFragment : Fragment() {
         private val listener: OnFavoriteFilmsClickListener
     ) :
         RecyclerView.Adapter<FilmsFavouriteItemViewHolder>() {
-        private val items = ArrayList<FavoriteItem>()
+        private val items = ArrayList<FilmsItem>()
 
-        fun setItems(films: List<FavoriteItem>) {
+        fun setItems(films: List<FilmsItem>) {
             items.clear()
             items.addAll(films)
             notifyDataSetChanged()
@@ -170,8 +173,8 @@ class FavoriteFragment : Fragment() {
         }
 
         interface OnFavoriteFilmsClickListener {
-            fun onFavoriteFilmsLongClick(filmsItem: FavoriteItem, position: Int): Boolean
-            fun onFavoriteFilmsFClick(filmsItem: FavoriteItem, position: Int)
+            fun onFavoriteFilmsLongClick(filmsItem: FilmsItem, position: Int): Boolean
+            fun onFavoriteFilmsFClick(filmsItem: FilmsItem, position: Int)
         }
     }
     //endregion

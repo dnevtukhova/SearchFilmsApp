@@ -1,4 +1,4 @@
-package com.example.dnevtukhova.searchfilmsapp.data
+package com.example.dnevtukhova.searchfilmsapp.data.entity
 
 import android.os.Parcelable
 import androidx.room.Entity
@@ -18,7 +18,8 @@ import kotlinx.android.parcel.Parcelize
     var description: String,
     var image: String?,
     var favorite: Boolean,
-    var watchLater: Boolean): Parcelable {
+    var watchLater: Boolean,
+    var dateToWatch: Long?): Parcelable {
     @IgnoredOnParcel
     @PrimaryKey(autoGenerate = true)
     var idFilms = 0
