@@ -10,14 +10,11 @@ import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
-import com.example.dnevtukhova.searchfilmsapp.data.FavoriteItem
-import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
-
 
 class MainActivity : AppCompatActivity(),
     FilmsListFragment.FilmsListListener,
@@ -194,11 +191,11 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    override fun onFavoriteFilmsLongClick(filmsItem: FavoriteItem, position: Int): Boolean {
+    override fun onFavoriteFilmsLongClick(filmsItem: FilmsItem, position: Int): Boolean {
         return true
     }
 
-    override fun onFavoriteFilmsFClick(filmsItem: FavoriteItem, position: Int) {
+    override fun onFavoriteFilmsFClick(filmsItem: FilmsItem, position: Int) {
         openDetailed()
     }
 

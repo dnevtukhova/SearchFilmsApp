@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -16,7 +15,6 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
@@ -28,9 +26,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.dnevtukhova.searchfilmsapp.App
-import com.example.dnevtukhova.searchfilmsapp.App.Companion.PAGE_NUMBER
 import com.example.dnevtukhova.searchfilmsapp.R
-import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PAGE_NUMBER
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
+import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.DetailFragmentViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsListViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
 import com.google.android.material.snackbar.Snackbar
@@ -43,6 +43,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     private lateinit var recycler: RecyclerView
     private lateinit var adapterFilms: FilmsAdapter
     private lateinit var filmsViewModel: FilmsListViewModel
+    private lateinit var detailViewModel: DetailFragmentViewModel
     private val calendar: Calendar = Calendar.getInstance()
     private var pIntentOnce: PendingIntent? = null
     private var am: AlarmManager? = null
@@ -53,7 +54,6 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     companion object {
         const val TAG = "FilmsListFragment"
-        const val PICTURE = "https://image.tmdb.org/t/p/w500/"
         const val CHANNEL_ID = "channel"
         const val FILMS_ITEM_EXTRA = "filmsItemExtra"
         const val BUNDLE = "bundle"
@@ -89,7 +89,9 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                 if (progressbar != null) {
                     progressbar.visibility = View.GONE
                 }
-                addSnackBar(error)
+                requireView().showSnackbar("Ошибка $error", Snackbar.LENGTH_LONG, "Обновить") {
+                    filmsViewModel.refreshAllFilms()
+                }
             })
         swipeRefreshLayout.setOnRefreshListener {
             if (progressbar != null) {
@@ -98,11 +100,15 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             filmsViewModel.mSettings.edit {
                 putInt(PAGE_NUMBER, 1)
             }.apply { }
-            filmsViewModel.removeAllFilms()
             filmsViewModel.refreshAllFilms()
             swipeRefreshLayout.isRefreshing = false
         }
         am = getSystemService(requireContext(), AlarmManager::class.java)
+
+        detailViewModel = ViewModelProvider(
+            requireActivity(),
+            myViewModelFactory
+        ).get(DetailFragmentViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -122,12 +128,15 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                 object :
                     FilmsAdapter.OnFilmsClickListener {
                     override fun onFilmsClick(filmsItem: FilmsItem, position: Int) {
-                        filmsViewModel.selectFilm(filmsItem)
+                        detailViewModel.selectFilm(filmsItem)
                         listener?.onFilmsSelected(filmsItem)
                     }
 
                     override fun onFavouriteClick(filmsItem: FilmsItem, position: Int) {
-                        Log.d(TAG, "${filmsItem.id} ${filmsItem.title} ${filmsItem.description} ${filmsItem.image}")
+                        Log.d(
+                            TAG,
+                            "${filmsItem.id} ${filmsItem.title} ${filmsItem.description} ${filmsItem.image}"
+                        )
                         filmsViewModel.selectFavorite(filmsItem)
                         adapterFilms.notifyItemChanged(position)
                     }
@@ -137,13 +146,12 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         intent = createIntent(filmsItem)
                         if (filmsItem.watchLater) {
                             myFilmsItem = filmsItem
+                            myFilmsItem!!.watchLater = false
                             myPosition = position
                             selectDateAndTime()
                         } else {
-                            filmsViewModel.selectWatchLater(
-                                filmsItem,
-                                Calendar.getInstance().timeInMillis
-                            )
+                            filmsItem.watchLater = true
+                            filmsViewModel.changeWatchLater(filmsItem)
                             if (pIntentOnce != null) {
                                 pIntentOnce = PendingIntent.getBroadcast(
                                     requireContext(),
@@ -189,32 +197,6 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             R.drawable.white_line
         )?.let { itemDecoration.setDrawable(it) }
         recycler.addItemDecoration(itemDecoration)
-    }
-
-    private fun addSnackBar(error: String) {
-        // Создание экземпляра Snackbar
-        val snackBar =
-            Snackbar.make(requireView(), "Ошибка $error", Snackbar.LENGTH_LONG)
-        // Устанавливаем цвет текста кнопки действий
-        snackBar.setActionTextColor(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.colorRed
-            )
-        )
-        // Получение snackbar
-        val snackBarView = snackBar.view
-        // Изменение цвета текста
-        val snackbarTextId = com.google.android.material.R.id.snackbar_text
-        val textView = snackBarView.findViewById<View>(snackbarTextId) as TextView
-        textView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-        // Изменение цвета фона
-        snackBarView.setBackgroundColor(Color.GRAY)
-        snackBar.setAnchorView(R.id.bottomNavigation)
-        snackBar.setAction("Обновить") {
-            filmsViewModel.refreshAllFilms()
-        }
-            .show()
     }
 
     interface FilmsListListener {
@@ -340,7 +322,8 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     private fun setAlarm() {
         Log.d(TAG, "setAlarm")
         dateNotification = calendar.timeInMillis
-        filmsViewModel.selectWatchLater(myFilmsItem!!, dateNotification!!)
+        myFilmsItem!!.dateToWatch = dateNotification
+        filmsViewModel.changeWatchLater(myFilmsItem!!)
         adapterFilms.notifyItemChanged(myPosition!!)
         pIntentOnce =
             PendingIntent.getBroadcast(
@@ -372,7 +355,8 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             val channel = NotificationChannel(CHANNEL_ID, name, importance)
             channel.description = description
 
-            val notificationManager = requireActivity().getSystemService(NotificationManager::class.java)
+            val notificationManager =
+                requireActivity().getSystemService(NotificationManager::class.java)
             notificationManager!!.createNotificationChannel(channel)
         }
     }

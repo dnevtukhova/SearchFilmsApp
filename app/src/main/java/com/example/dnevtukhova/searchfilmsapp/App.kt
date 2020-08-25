@@ -4,9 +4,10 @@ import android.app.Application
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.dnevtukhova.searchfilmsapp.data.FilmsDb
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsRepository
-import com.example.dnevtukhova.searchfilmsapp.data.ServerApi
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.BASE_URL
+import com.example.dnevtukhova.searchfilmsapp.data.api.ServerApi
+import com.example.dnevtukhova.searchfilmsapp.data.db.FilmsDb
 import com.example.dnevtukhova.searchfilmsapp.domain.FilmsInteractor
 import com.squareup.picasso.BuildConfig
 import okhttp3.OkHttpClient
@@ -17,13 +18,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class App : Application() {
     companion object {
-        const val BASE_URL = "https://api.themoviedb.org/3/movie/"
         lateinit var instance: App
             private set
-        const val API_KEY = "79c459d10744203ee914c139f789d1e8"
-        const val LANGUAGE = "ru-RUS"
-        const val CURRENT_DATE = "current date"
-        const val PAGE_NUMBER = "page number"
         var favoriteF: Boolean = false
         var listF: Boolean = true
         var watchLaterF: Boolean = false
@@ -32,7 +28,7 @@ class App : Application() {
     lateinit var api: ServerApi
     lateinit var filmsInteractor: FilmsInteractor
     private lateinit var filmsRepository: FilmsRepository
-    private var INSTANCE: FilmsDb? = null
+    private var DBInstance: FilmsDb? = null
     private val MIGRATION_1_2 = object: Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE 'watchLater_table' ( 'id' INTEGER, " +
@@ -46,12 +42,17 @@ class App : Application() {
             database.execSQL("ALTER TABLE films_table ADD COLUMN watchLater DEFAULT 1 NOT NULL")
         }
     }
+    private val MIGRATION_2_3 = object: Migration(2, 3) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE films_table ADD COLUMN dateToWatch DEFAULT 1 NOT NULL")
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
         instance = this
         initDb()
-        filmsRepository = FilmsRepository(INSTANCE)
+        filmsRepository = FilmsRepository(DBInstance)
         initRetrofit()
         initInteractor()
     }
@@ -80,20 +81,19 @@ class App : Application() {
     }
 
     private fun initDb(): FilmsDb? {
-        if (INSTANCE == null) {
+        if (DBInstance == null) {
             synchronized(FilmsDb::class) {
 
-                INSTANCE = Room.databaseBuilder(
+                DBInstance = Room.databaseBuilder(
                     applicationContext,
                     FilmsDb::class.java,
                     "films_database"
-
                 )
-                  //  .allowMainThreadQueries()
                     .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_2_3)
                     .build()
             }
         }
-        return INSTANCE
+        return DBInstance
     }
 }

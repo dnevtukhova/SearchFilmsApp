@@ -7,7 +7,7 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.dnevtukhova.searchfilmsapp.R
-import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 
 class Receiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, p1: Intent?) {

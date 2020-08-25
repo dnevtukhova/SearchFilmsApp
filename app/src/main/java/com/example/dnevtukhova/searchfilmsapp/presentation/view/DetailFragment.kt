@@ -1,15 +1,15 @@
 package com.example.dnevtukhova.searchfilmsapp.presentation.view
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -17,19 +17,21 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
-import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
-import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsListViewModel
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
+import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.DetailFragmentViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
 import com.google.android.material.appbar.CollapsingToolbarLayout
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_detail.*
+import java.io.File
+
+const val PERMISSION_REQUEST_WRITE_STORAGE = 0
 
 class DetailFragment : Fragment() {
 
-    private lateinit var mImageView: ImageView
-    private lateinit var mTextView: TextView
-    private lateinit var mCheckBox: CheckBox
-    private lateinit var mEditText: EditText
-    private lateinit var detailViewViewModel: FilmsListViewModel
+    private lateinit var detailViewViewModel: DetailFragmentViewModel
+    private lateinit var filmsDetailItem: FilmsItem
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +43,7 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        progressbarLoadImage.visibility = View.INVISIBLE
         val bundle = arguments
         val filmsItem: FilmsItem? = bundle?.getParcelable("key")
 
@@ -48,7 +51,7 @@ class DetailFragment : Fragment() {
         detailViewViewModel = ViewModelProvider(
             requireActivity(),
             myViewModelFactory
-        ).get(FilmsListViewModel::class.java)
+        ).get(DetailFragmentViewModel::class.java)
         Log.d(TAG, "filmsItem $filmsItem")
         if (filmsItem != null) {
             detailViewViewModel.selectFilm(filmsItem)
@@ -61,23 +64,105 @@ class DetailFragment : Fragment() {
                 collapsingToolbarLayout.title = filmsDetail.title
                 collapsingToolbarLayout.setExpandedTitleColor(
                     getColor(
-                        context!!,
+                        requireContext(),
                         android.R.color.transparent
                     )
                 )
-                mImageView = view.findViewById(R.id.image_detail_view)
-                mTextView = view.findViewById(R.id.description)
-                mCheckBox = view.findViewById(R.id.checkbox_like)
-                mEditText = view.findViewById(R.id.edit_text)
                 initializeObjects(filmsDetail)
+                filmsDetailItem = filmsDetail
+                button_load_file.setOnClickListener { loadPoster() }
             })
+    }
+
+    private fun loadPoster() {
+        // Проверяем разрешения на запись в хранилище
+        if (requireActivity().checkSelfPermissionCompat(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            // разрешение уже получено, запускаем процесс загрузки картинки и сохранения в галерее
+            progressbarLoadImage.visibility = View.VISIBLE
+            detailViewViewModel.loadImage(filmsDetailItem, requireContext())
+            detailViewViewModel.loadImageLiveD.observe(this.viewLifecycleOwner,
+                Observer<DetailFragmentViewModel.State> { result ->
+                    when (result) {
+                        is DetailFragmentViewModel.State.Success -> {
+                            if (progressbarLoadImage != null) {
+                                progressbarLoadImage.visibility = View.GONE
+                            }
+                            galleryAddPic(result.imagePath)
+                            requireView().showSnackbar(
+                                R.string.fileSaveInGallery,
+                                Snackbar.LENGTH_INDEFINITE
+                            )
+                        }
+                        is DetailFragmentViewModel.State.Error -> {
+                            if (progressbarLoadImage != null) {
+                                progressbarLoadImage.visibility = View.GONE
+                            }
+                            requireView().showSnackbar(result.error!!, Snackbar.LENGTH_SHORT)
+                        }
+                    }
+                })
+        } else {
+            // Нужно получить разрещшение
+            requireView().showSnackbar(
+                R.string.permissionSaveFile,
+                Snackbar.LENGTH_SHORT
+            )
+            requestWriteExternalStoragePermission()
+        }
+    }
+
+    private fun requestWriteExternalStoragePermission() {
+        // Permission has not been granted and must be requested.
+        if (requireActivity().shouldShowRequestPermissionRationaleCompat(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            requireView().showSnackbar(
+                R.string.saveImageInGallery,
+                Snackbar.LENGTH_INDEFINITE, R.string.ok
+            ) {
+                requestPermissions(
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    PERMISSION_REQUEST_WRITE_STORAGE
+                )
+            }
+
+        } else {
+            requireView().showSnackbar(
+                R.string.getPermissionSaveFile,
+                Snackbar.LENGTH_LONG
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_WRITE_STORAGE) {
+            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                requireView().showSnackbar(R.string.permissionIsDone, Snackbar.LENGTH_SHORT)
+                loadPoster()
+            } else {
+                requireView().showSnackbar(R.string.permissionNoGranted, Snackbar.LENGTH_SHORT)
+
+            }
+        }
+    }
+
+    private fun galleryAddPic(imagePath: String?) {
+        val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+        val contentUri: Uri = Uri.fromFile(File(imagePath))
+        mediaScanIntent.data = contentUri
+        requireActivity().sendBroadcast(mediaScanIntent)
     }
 
     @SuppressLint("ResourceType")
     fun initializeObjects(item: FilmsItem) {
-        Glide.with(mImageView.context)
-            .load(FilmsListFragment.PICTURE + item.image)
-            .into(mImageView)
+        Glide.with(image_detail_view.context)
+            .load(PICTURE + item.image)
+            .into(image_detail_view)
         description.text = item.description
     }
 

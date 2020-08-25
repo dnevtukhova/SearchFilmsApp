@@ -31,10 +31,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
-import com.example.dnevtukhova.searchfilmsapp.data.FilmsItem
-import com.example.dnevtukhova.searchfilmsapp.data.WatchLaterItem
-import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsListViewModel
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
+import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
+import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.WatchLaterFragmentViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -42,9 +42,9 @@ import kotlin.collections.ArrayList
 class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
     private lateinit var adapterWatchLaterFilms: FilmsWatchLaterAdapter
-    private lateinit var watchLaterViewModel: FilmsListViewModel
+    private lateinit var watchLaterViewModel: WatchLaterFragmentViewModel
     private val calendar: Calendar = Calendar.getInstance()
-    private var watchLaterItem: WatchLaterItem? = null
+    private var watchLaterItem: FilmsItem? = null
     private var myPosition: Int? = null
     private var intent: Intent? = null
 
@@ -67,10 +67,10 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         watchLaterViewModel = ViewModelProvider(
             requireActivity(),
             myViewModelFactory
-        ).get(FilmsListViewModel::class.java)
+        ).get(WatchLaterFragmentViewModel::class.java)
         watchLaterViewModel.watchLaterFilms?.observe(
             this.viewLifecycleOwner,
-            Observer<List<WatchLaterItem>> { films -> adapterWatchLaterFilms.setItems(films) })
+            Observer<List<FilmsItem>> { films -> adapterWatchLaterFilms.setItems(films) })
     }
 
     private fun initRecycler(view: View) {
@@ -83,7 +83,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                 object :
                     FilmsWatchLaterAdapter.OnWatchLaterFilmsClickListener {
                     @RequiresApi(Build.VERSION_CODES.M)
-                    override fun onWatchLaterFilmsFClick(filmsItem: WatchLaterItem, position: Int) {
+                    override fun onWatchLaterFilmsFClick(filmsItem: FilmsItem, position: Int) {
                         watchLaterItem = filmsItem
                         myPosition = position
                         intent = createIntent(filmsItem)
@@ -141,7 +141,12 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         adapterWatchLaterFilms.notifyItemChanged(myPosition!!)
         Log.d(TAG, intent.toString())
         val pIntentOnce =
-            PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getBroadcast(
+                requireContext(),
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
         val am: AlarmManager? =
             ContextCompat.getSystemService(requireContext(), AlarmManager::class.java)
         am?.setExact(
@@ -151,18 +156,10 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         )
     }
 
-    fun createIntent(filmsItem: WatchLaterItem): Intent {
-        val filmsItem1 = FilmsItem(
-            filmsItem.id,
-            filmsItem.title,
-            filmsItem.description,
-            filmsItem.image,
-            filmsItem.favorite,
-            filmsItem.watchLater
-        )
+    fun createIntent(filmsItem: FilmsItem): Intent {
         val intent = Intent("${filmsItem.id}", null, context, Receiver::class.java)
         val bundle = Bundle()
-        bundle.putParcelable(FilmsListFragment.FILMS_ITEM_EXTRA, filmsItem1)
+        bundle.putParcelable(FilmsListFragment.FILMS_ITEM_EXTRA, filmsItem)
         intent.putExtra(FilmsListFragment.BUNDLE, bundle)
         return intent
     }
@@ -175,14 +172,14 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         var container: ConstraintLayout = itemView.findViewById(R.id.container)
 
         @SuppressLint("SimpleDateFormat", "SetTextI18n")
-        fun bind(item: WatchLaterItem) {
+        fun bind(item: FilmsItem) {
             titleTv.text = item.title
             val locale = Locale("RU")
             val simpleDateFormat = SimpleDateFormat("EEEE dd MMMM yyyy HH:mm", locale)
-            val dateToWatch = simpleDateFormat.format(Date(item.dateToWatch)).toString()
+            val dateToWatch = simpleDateFormat.format(Date(item.dateToWatch!!)).toString()
             date.text = "Напомнить посмотреть фильм: $dateToWatch"
             Glide.with(imageFilm.context)
-                .load(FilmsListFragment.PICTURE + item.image)
+                .load(PICTURE + item.image)
                 .placeholder(R.drawable.ic_photo_black_24dp)
                 .error(R.drawable.ic_error_outline_black_24dp)
                 .centerCrop()
@@ -197,9 +194,9 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         private val listener: OnWatchLaterFilmsClickListener
     ) :
         RecyclerView.Adapter<FilmsWatchLaterViewHolder>() {
-        private val items = ArrayList<WatchLaterItem>()
+        private val items = ArrayList<FilmsItem>()
 
-        fun setItems(films: List<WatchLaterItem>) {
+        fun setItems(films: List<FilmsItem>) {
             items.clear()
             items.addAll(films)
             notifyDataSetChanged()
@@ -232,7 +229,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         }
 
         interface OnWatchLaterFilmsClickListener {
-            fun onWatchLaterFilmsFClick(filmsItem: WatchLaterItem, position: Int)
+            fun onWatchLaterFilmsFClick(filmsItem: FilmsItem, position: Int)
         }
     }
     //endregion

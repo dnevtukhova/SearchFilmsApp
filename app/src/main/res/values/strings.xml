@@ -19,4 +19,12 @@
     <string name="channelName" translatable="false">Films Channel</string>
     <string name="channelDescription" translatable="false">Films Channel description</string>
     <string name="reminderWatchFilm">Напомнить посмотреть фильм:</string>
+    <string name="downloadPoster">Скачать постер</string>
+    <string name="saveImageInGallery">Сохранить картинку в галерее</string>
+    <string name="ok">ОК</string>
+    <string name="fileSaveInGallery">Файл сохранен в галерее</string>
+    <string name="permissionSaveFile">Необходимо получить разрешение на сохранение файла</string>
+    <string name="getPermissionSaveFile">Необходимо предоставить разрешение на запись файла в хранилище</string>
+    <string name="permissionIsDone">Разрешение Предоставлено</string>
+    <string name="permissionNoGranted">Разрешение НЕ предоставлено</string>
 </resources>

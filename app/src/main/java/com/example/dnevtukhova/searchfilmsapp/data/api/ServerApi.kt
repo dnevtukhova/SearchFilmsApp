@@ -1,4 +1,4 @@
-package com.example.dnevtukhova.searchfilmsapp.data
+package com.example.dnevtukhova.searchfilmsapp.data.api
 
 import io.reactivex.Single
 import retrofit2.http.GET

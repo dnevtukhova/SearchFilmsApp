@@ -1,4 +1,4 @@
-package com.example.dnevtukhova.searchfilmsapp.data.entity
+package com.example.dnevtukhova.searchfilmsapp.data.api
 
 import com.google.gson.annotations.SerializedName
 

@@ -1,5 +1,7 @@
 package com.example.dnevtukhova.searchfilmsapp.data
 
+import com.example.dnevtukhova.searchfilmsapp.data.db.FilmsDb
+import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
@@ -7,46 +9,19 @@ import io.reactivex.schedulers.Schedulers
 class FilmsRepository(filmsDb: FilmsDb?) {
     private var filmsDao = filmsDb?.getFilmsDao()
     private var filmsData: Flowable<List<FilmsItem>>? = filmsDao?.getFilms()
-    private var favoriteData: Flowable<List<FavoriteItem>>? = filmsDao?.getAllFavorite()
-    private var watchLaterData: Flowable<List<WatchLaterItem>>? = filmsDao?.getAllWatchLater()
+    private var favoriteData: Flowable<List<FilmsItem>>? = filmsDao?.getAllFavorite()
+    private var watchLaterData: Flowable<List<FilmsItem>>? = filmsDao?.getAllWatchLater()
 
     val films: Flowable<List<FilmsItem>>?
         get() = filmsData
-    val favoriteFilms: Flowable<List<FavoriteItem>>?
+    val favoriteFilms: Flowable<List<FilmsItem>>?
         get() = favoriteData
-    val watchLaterFilms: Flowable<List<WatchLaterItem>>?
+    val watchLaterFilms: Flowable<List<FilmsItem>>?
         get() = watchLaterData
 
     fun addToCache(films: List<FilmsItem>) {
         Completable.fromRunnable {
             filmsDao?.insertAll(films)
-        }
-            .subscribeOn(Schedulers.computation())
-            .subscribe()
-    }
-
-    fun getItemFavorite(id: Int): FavoriteItem? = filmsDao?.getItemFavorite(id)
-
-    fun addToFavorite(favoriteItem: FavoriteItem, isFavorite: Boolean) {
-        Completable.fromRunnable {
-            filmsDao?.insertInFavorite(favoriteItem)
-            filmsDao?.updateIsFavorite(favoriteItem.id, isFavorite)
-        }
-            .subscribeOn(Schedulers.computation())
-            .subscribe()
-    }
-
-    fun addToFavorite(itemFilm: FavoriteItem) {
-        Completable.fromRunnable {
-            filmsDao?.insertInFavorite(itemFilm)
-        }
-            .subscribeOn(Schedulers.computation())
-            .subscribe()
-    }
-
-    fun removeFromFavorite(itemFilm: FavoriteItem) {
-        Completable.fromRunnable {
-            filmsDao?.deleteItemFavorite(itemFilm)
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()
@@ -60,7 +35,7 @@ class FilmsRepository(filmsDb: FilmsDb?) {
             .subscribe()
     }
 
-    fun setFavorite(itemFilm: FavoriteItem, favorite: Boolean) {
+    fun setFavorite(itemFilm: FilmsItem, favorite: Boolean) {
         Completable.fromRunnable {
             filmsDao?.setFilms(itemFilm.id, favorite)
         }
@@ -68,39 +43,9 @@ class FilmsRepository(filmsDb: FilmsDb?) {
             .subscribe()
     }
 
-    fun removeAllFilms() {
+    fun setDateToWatch(itemFilm: FilmsItem) {
         Completable.fromRunnable {
-            filmsDao?.removeAllFilms()
-        }
-            .subscribeOn(Schedulers.computation())
-            .subscribe()
-    }
-
-    //watchLater
-
-    fun addToWatchLater(itemFilm: WatchLaterItem) {
-        Completable.fromRunnable {
-            filmsDao?.insertInWatchLater(itemFilm)
-        }
-            .subscribeOn(Schedulers.computation())
-            .subscribe()
-    }
-
-    fun removeFromWatchLater(itemFilm: WatchLaterItem) {
-        Completable.fromRunnable {
-            filmsDao?.deleteItemWatchLater(itemFilm)
-        }
-            .subscribeOn(Schedulers.computation())
-            .subscribe()
-    }
-
-    fun getItemWatchLater(id: Int): WatchLaterItem? {
-        return filmsDao?.getItemWatchLater(id)
-    }
-
-    fun setDateToWatch(itemFilm: WatchLaterItem) {
-        Completable.fromRunnable {
-            filmsDao?.updateTimeToWatch(itemFilm.id, itemFilm.dateToWatch)
+            filmsDao?.updateTimeToWatch(itemFilm.id, itemFilm.dateToWatch!!)
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()
