@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.example.dnevtukhova.searchfilmsapp.domain.FilmsInteractor
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class WatchLaterFragmentViewModel(private val filmsInteractor: FilmsInteractor) : ViewModel() {
+class WatchLaterFragmentViewModel @Inject constructor(val filmsInteractor: FilmsInteractor) :
+    ViewModel() {
     private val watchLaterLiveData: LiveData<List<FilmsItem>>? =
         LiveDataReactiveStreams.fromPublisher(
             filmsInteractor.getWatchLater()!!.subscribeOn(

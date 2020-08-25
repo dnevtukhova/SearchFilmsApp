@@ -25,25 +25,28 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PAGE_NUMBER
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.di.Injectable
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.DetailFragmentViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsListViewModel
-import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_film_list.*
 import java.util.*
+import javax.inject.Inject
 
 class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
-    TimePickerDialog.OnTimeSetListener {
+    TimePickerDialog.OnTimeSetListener, Injectable {
     var listener: FilmsListListener? = null
     private lateinit var recycler: RecyclerView
     private lateinit var adapterFilms: FilmsAdapter
-    private lateinit var filmsViewModel: FilmsListViewModel
-    private lateinit var detailViewModel: DetailFragmentViewModel
+    @Inject
+    lateinit var filmsViewModelFactory: ViewModelProvider.Factory
+    lateinit var filmsViewModel: FilmsListViewModel
+    lateinit var detailViewModel: DetailFragmentViewModel
+
     private val calendar: Calendar = Calendar.getInstance()
     private var pIntentOnce: PendingIntent? = null
     private var am: AlarmManager? = null
@@ -72,10 +75,9 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         super.onViewCreated(view, savedInstanceState)
         createNotificationChannel()
         initRecycler(view, progressbar)
-        val myViewModelFactory = FilmsViewModelFactory(App.instance.filmsInteractor)
         filmsViewModel = ViewModelProvider(
             requireActivity(),
-            myViewModelFactory
+            filmsViewModelFactory
         ).get(FilmsListViewModel::class.java)
         filmsViewModel.films?.observe(
             this.viewLifecycleOwner,
@@ -107,7 +109,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         detailViewModel = ViewModelProvider(
             requireActivity(),
-            myViewModelFactory
+            filmsViewModelFactory
         ).get(DetailFragmentViewModel::class.java)
     }
 

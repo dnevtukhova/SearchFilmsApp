@@ -20,8 +20,9 @@ import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import javax.inject.Inject
 
-class DetailFragmentViewModel(private val filmsInteractor: FilmsInteractor) : ViewModel() {
+class DetailFragmentViewModel @Inject constructor(filmsInteractor: FilmsInteractor) : ViewModel() {
     private val filmsDetailLiveData = MutableLiveData<FilmsItem>()
     private val loadImageLiveData = MutableLiveData<State>()
 
@@ -57,7 +58,6 @@ class DetailFragmentViewModel(private val filmsInteractor: FilmsInteractor) : Vi
             .load(NetworkConstants.PICTURE + filmsDetailItem.image)
             .into(object : CustomTarget<Bitmap>(500, 500) {
                 override fun onLoadCleared(placeholder: Drawable?) {
-                    //  Toast.makeText(context, "onLoadCleared", Toast.LENGTH_SHORT).show()
                     loadImageLiveData.postValue(State.Error("onLoadCleared"))
                 }
 

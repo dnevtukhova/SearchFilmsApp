@@ -17,8 +17,9 @@ import com.example.dnevtukhova.searchfilmsapp.domain.FilmsInteractor
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
+import javax.inject.Inject
 
-class FilmsListViewModel(private val filmsInteractor: FilmsInteractor) : ViewModel() {
+class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteractor) : ViewModel() {
     private var filmsLiveData: LiveData<List<FilmsItem>> =
         LiveDataReactiveStreams.fromPublisher(filmsInteractor.getFilms()!!.subscribeOn(Schedulers.io()))
     private val errorLiveData = SingleLiveEvent<String>()

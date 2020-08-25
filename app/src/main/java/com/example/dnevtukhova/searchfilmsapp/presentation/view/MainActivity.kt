@@ -15,10 +15,15 @@ import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.HasSupportFragmentInjector
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(),
     FilmsListFragment.FilmsListListener,
-    FavoriteFragment.FilmsFavoriteAdapter.OnFavoriteFilmsClickListener {
+    FavoriteFragment.FilmsFavoriteAdapter.OnFavoriteFilmsClickListener, HasSupportFragmentInjector {
+    @Inject
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
     var filmsItem: FilmsItem? = null
 
     companion object {
@@ -244,6 +249,8 @@ class MainActivity : AppCompatActivity(),
             }
         }
     }
+
+    override fun supportFragmentInjector() = dispatchingAndroidInjector
 }
 
 

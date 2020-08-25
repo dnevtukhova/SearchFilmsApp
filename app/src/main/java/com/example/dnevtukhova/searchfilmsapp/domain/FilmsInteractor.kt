@@ -1,15 +1,17 @@
 package com.example.dnevtukhova.searchfilmsapp.domain
-import com.example.dnevtukhova.searchfilmsapp.data.*
+
+import com.example.dnevtukhova.searchfilmsapp.data.FilmsRepository
 import com.example.dnevtukhova.searchfilmsapp.data.api.PopularFilms
 import com.example.dnevtukhova.searchfilmsapp.data.api.ServerApi
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import io.reactivex.Flowable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
-class FilmsInteractor(
-    private val serverApi: ServerApi,
-    private var filmsRepository: FilmsRepository
+class FilmsInteractor @Inject constructor(
+    val serverApi: ServerApi,
+    val filmsRepository: FilmsRepository
 
 ) {
     fun getFilms(key: String, language: String, page: Int, callback: GetFilmsCallback) {
@@ -77,10 +79,10 @@ class FilmsInteractor(
     }
 
     fun changeWatchLater(filmsItem: FilmsItem) {
-           filmsRepository.setFilms(filmsItem)
-        }
+        filmsRepository.setFilms(filmsItem)
+    }
 
     fun setDateToWatch(watchLaterItem: FilmsItem) {
-    filmsRepository.setDateToWatch(watchLaterItem)
-}
+        filmsRepository.setDateToWatch(watchLaterItem)
+    }
 }
