@@ -15,22 +15,25 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
-import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.di.Injectable
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.DetailFragmentViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.fragment_detail.*
 import java.io.File
+import javax.inject.Inject
 
 const val PERMISSION_REQUEST_WRITE_STORAGE = 0
 
-class DetailFragment : Fragment() {
+class DetailFragment : Fragment(), Injectable {
+    @Inject
+    lateinit var filmsViewModelFactory: FilmsViewModelFactory
 
-    private lateinit var detailViewViewModel: DetailFragmentViewModel
+    lateinit var detailViewViewModel: DetailFragmentViewModel
     private lateinit var filmsDetailItem: FilmsItem
 
     override fun onCreateView(
@@ -47,10 +50,9 @@ class DetailFragment : Fragment() {
         val bundle = arguments
         val filmsItem: FilmsItem? = bundle?.getParcelable("key")
 
-        val myViewModelFactory = FilmsViewModelFactory(App.instance.filmsInteractor)
         detailViewViewModel = ViewModelProvider(
             requireActivity(),
-            myViewModelFactory
+            filmsViewModelFactory
         ).get(DetailFragmentViewModel::class.java)
         Log.d(TAG, "filmsItem $filmsItem")
         if (filmsItem != null) {

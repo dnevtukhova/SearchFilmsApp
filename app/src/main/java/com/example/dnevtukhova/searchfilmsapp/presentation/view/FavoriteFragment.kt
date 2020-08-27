@@ -17,20 +17,22 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
+import com.example.dnevtukhova.searchfilmsapp.di.Injectable
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.DetailFragmentViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FavoriteFragmentViewModel
-import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
+import javax.inject.Inject
 
-class FavoriteFragment : Fragment() {
+class FavoriteFragment : Fragment(), Injectable {
     var listener: FilmsFavoriteAdapter.OnFavoriteFilmsClickListener? = null
-    private lateinit var favoriteViewModel: FavoriteFragmentViewModel
-    private lateinit var detailViewModel: DetailFragmentViewModel
+    @Inject
+    lateinit var filmsViewModelFactory: ViewModelProvider.Factory
+    lateinit var favoriteViewModel: FavoriteFragmentViewModel
+    lateinit var detailViewModel: DetailFragmentViewModel
     private lateinit var adapterFavoriteFilms: FilmsFavoriteAdapter
 
     companion object {
@@ -48,10 +50,9 @@ class FavoriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycler(view)
-        val myViewModelFactory = FilmsViewModelFactory(App.instance.filmsInteractor)
         favoriteViewModel = ViewModelProvider(
             requireActivity(),
-            myViewModelFactory
+            filmsViewModelFactory
         ).get(FavoriteFragmentViewModel::class.java)
         favoriteViewModel.favoriteFilms?.observe(
             this.viewLifecycleOwner,
@@ -59,7 +60,7 @@ class FavoriteFragment : Fragment() {
 
         detailViewModel = ViewModelProvider(
             requireActivity(),
-            myViewModelFactory
+            filmsViewModelFactory
         ).get(DetailFragmentViewModel::class.java)
     }
 

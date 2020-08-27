@@ -29,20 +29,22 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
-import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsViewModelFactory
+import com.example.dnevtukhova.searchfilmsapp.di.Injectable
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.WatchLaterFragmentViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
-    TimePickerDialog.OnTimeSetListener {
+    TimePickerDialog.OnTimeSetListener, Injectable {
+    @Inject
+    lateinit var filmsViewModelFactory: ViewModelProvider.Factory
     private lateinit var adapterWatchLaterFilms: FilmsWatchLaterAdapter
-    private lateinit var watchLaterViewModel: WatchLaterFragmentViewModel
+    lateinit var watchLaterViewModel: WatchLaterFragmentViewModel
     private val calendar: Calendar = Calendar.getInstance()
     private var watchLaterItem: FilmsItem? = null
     private var myPosition: Int? = null
@@ -63,10 +65,9 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycler(view)
-        val myViewModelFactory = FilmsViewModelFactory(App.instance.filmsInteractor)
         watchLaterViewModel = ViewModelProvider(
             requireActivity(),
-            myViewModelFactory
+            filmsViewModelFactory
         ).get(WatchLaterFragmentViewModel::class.java)
         watchLaterViewModel.watchLaterFilms?.observe(
             this.viewLifecycleOwner,
