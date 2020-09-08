@@ -18,6 +18,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -33,18 +34,25 @@ import com.example.dnevtukhova.searchfilmsapp.di.Injectable
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.DetailFragmentViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsListViewModel
 import com.google.android.material.snackbar.Snackbar
+import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_film_list.*
+import testing.OpenClass
+import testing.OpenForTesting
 import java.util.*
 import javax.inject.Inject
 
-class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
+open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener, Injectable {
     var listener: FilmsListListener? = null
     private lateinit var recycler: RecyclerView
-    private lateinit var adapterFilms: FilmsAdapter
+    lateinit var adapterFilms: FilmsAdapter
     @Inject
     lateinit var filmsViewModelFactory: ViewModelProvider.Factory
+
     lateinit var filmsViewModel: FilmsListViewModel
+//    by viewModels {
+//         filmsViewModelFactory
+//     }
     lateinit var detailViewModel: DetailFragmentViewModel
 
     private val calendar: Calendar = Calendar.getInstance()
@@ -117,6 +125,14 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         super.onCreate(savedInstanceState)
         retainInstance = true
     }
+
+    override fun onAttach(context: Context) {
+        injectMembers()
+        super.onAttach(context)
+    }
+
+    protected open fun injectMembers() =
+        AndroidSupportInjection.inject(this)
 
     private fun initRecycler(view: View, progressBar: ProgressBar) {
         recycler = view.findViewById(R.id.recyclerViewFragment)
@@ -237,7 +253,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             }
         }
     }
-
+@OpenForTesting
     class FilmsAdapter(
         private val progressBar: ProgressBar,
         private val context: Context,
@@ -353,7 +369,7 @@ class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.channelName)
             val description = getString(R.string.channelDescription)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(CHANNEL_ID, name, importance)
             channel.description = description
 

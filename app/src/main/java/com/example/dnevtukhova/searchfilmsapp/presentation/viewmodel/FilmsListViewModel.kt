@@ -16,9 +16,11 @@ import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.example.dnevtukhova.searchfilmsapp.domain.FilmsInteractor
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
+import testing.OpenForTesting
 import java.util.*
 import javax.inject.Inject
 
+@OpenForTesting
 class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteractor) : ViewModel() {
     private var filmsLiveData: LiveData<List<FilmsItem>> =
         LiveDataReactiveStreams.fromPublisher(filmsInteractor.getFilms()!!.subscribeOn(Schedulers.io()))

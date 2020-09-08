@@ -17,11 +17,13 @@ import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableCompletableObserver
 import io.reactivex.schedulers.Schedulers
+import testing.OpenForTesting
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import javax.inject.Inject
 
+@OpenForTesting
 class DetailFragmentViewModel @Inject constructor(filmsInteractor: FilmsInteractor) : ViewModel() {
     private val filmsDetailLiveData = MutableLiveData<FilmsItem>()
     private val loadImageLiveData = MutableLiveData<State>()

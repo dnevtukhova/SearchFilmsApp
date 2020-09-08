@@ -55,8 +55,8 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun providesFilmsRepository(filmsDb: FilmsDb): FilmsRepository {
-        return FilmsRepository(filmsDb)
+    fun providesFilmsRepository(filmsDao: FilmsDao): FilmsRepository {
+        return FilmsRepository(filmsDao)
     }
 
     @Singleton
@@ -67,8 +67,8 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun providesFilmsDAO(filmsDb: FilmsDb?): FilmsDao? {
-        return filmsDb?.getFilmsDao()
+    fun providesFilmsDAO(filmsDb: FilmsDb): FilmsDao {
+        return filmsDb.getFilmsDao()
     }
 
 }
