@@ -119,39 +119,40 @@ class MainActivity : AppCompatActivity(),
         openDetailed()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.films_menu, menu)
-        return true
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        val inflater = menuInflater
+//        inflater.inflate(R.menu.films_menu, menu)
+//        return true
+//    }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            R.id.invite_friend -> {
-                val i = Intent(Intent.ACTION_SEND)
-                i.type = "text/plain"
-                i.putExtra(Intent.EXTRA_TEXT, getString(R.string.invite))
-                startActivity(i)
-            }
-            R.id.app_theme -> {
-                if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                }
-                finish()
-                startActivity(Intent(applicationContext, MainActivity::class.java))
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+//        when (item?.itemId) {
+//            R.id.invite_friend -> {
+////                val i = Intent(Intent.ACTION_SEND)
+////                i.type = "text/plain"
+////                i.putExtra(Intent.EXTRA_TEXT, getString(R.string.invite))
+////                startActivity(i)
+//            }
+//            R.id.app_theme -> {
+//                if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+//                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+//                } else {
+//                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+//                }
+//                finish()
+//                startActivity(Intent(applicationContext, MainActivity::class.java))
+//            }
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     private fun setBottomNavigation() {
         val bar: BottomNavigationView = findViewById(R.id.bottomNavigation)
         bar.setOnNavigationItemSelectedListener {
             when (it.itemId) {
+                R.id.settings -> {}
                 R.id.film_favorite -> {
-                    supportActionBar?.show()
+                  //  supportActionBar?.show()
                     App.favoriteF = true
                     App.listF = false
                     App.watchLaterF = false
@@ -165,6 +166,7 @@ class MainActivity : AppCompatActivity(),
                         .commit()
                 }
                 R.id.all_films -> {
+                    supportActionBar?.show()
                     App.listF = true
                     App.favoriteF = false
                     App.watchLaterF = false

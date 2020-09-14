@@ -4,7 +4,6 @@
     <string name="details">Details</string>
     <string name="invite_friend">To invite a friend</string>
     <string name="invite">Dear friend, I invite you to rate my Search Films app.</string>
-    <string name="like">Like</string>
     <string name="comment">Comment</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -25,4 +24,6 @@
     <string name="permissionIsDone">" Permission Granted"</string>
     <string name="permissionNoGranted">" Permission Not Granted"</string>
     <string name="downloadPoster">Downloap poster</string>
+    <string name="rating">Rating</string>
+    <string name="settings">Settings</string>
 </resources>

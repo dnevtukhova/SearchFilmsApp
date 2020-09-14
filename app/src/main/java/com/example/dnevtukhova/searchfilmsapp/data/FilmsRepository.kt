@@ -27,6 +27,18 @@ class FilmsRepository (filmsDao: FilmsDao) {
             .subscribe()
     }
 
+    fun getFilm (id: Int): FilmsItem {
+        return filmsDao.getFilm(id)
+    }
+
+    fun addFilm (filmsItem: FilmsItem) {
+        Completable.fromRunnable {
+            filmsDao.insert(filmsItem)
+        }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
+    }
+
     fun setFilms(itemFilm: FilmsItem) {
         Completable.fromRunnable {
             filmsDao.updateFilms(itemFilm)
@@ -46,6 +58,14 @@ class FilmsRepository (filmsDao: FilmsDao) {
     fun setDateToWatch(itemFilm: FilmsItem) {
         Completable.fromRunnable {
             filmsDao.updateTimeToWatch(itemFilm.id, itemFilm.dateToWatch!!)
+        }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
+    }
+
+    fun removeAllFilms() {
+        Completable.fromRunnable {
+            filmsDao?.removeAllFilms()
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()

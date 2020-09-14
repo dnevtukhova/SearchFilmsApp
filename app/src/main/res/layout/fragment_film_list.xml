@@ -14,7 +14,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
+<!--        <FrameLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewFragment"
             android:layout_width="match_parent"
@@ -22,7 +28,16 @@
             android:background="@color/grayLight"
             tools:itemCount="33"
             tools:listitem="@layout/item_news"/>
-
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewFragmentSearch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/grayLight"
+            tools:itemCount="33"
+            android:visibility="invisible"
+            tools:listitem="@layout/item_news"/>
+<!--        </FrameLayout>-->
+</LinearLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <ProgressBar
@@ -32,9 +47,10 @@
        style="@android:style/Widget.Material.ProgressBar.Small"
         android:scaleX="0.1"
         android:scaleY="0.1"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

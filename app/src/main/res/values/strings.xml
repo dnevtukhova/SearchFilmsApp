@@ -2,8 +2,8 @@
     <string name="app_name">Поиск Фильмов</string>
     <string name="details">Детали</string>
     <string name="invite_friend">Пригласить друга</string>
-    <string name="invite">Дорогой друг, приглашаю тебя оценить мое приложение Search Films</string>
-    <string name="like">Нравится</string>
+    <string name="invite">Дорогой друг, рекомендую посмотреть фильм</string>
+    <string name="rating">Рейтинг</string>
     <string name="comment">Комментарий</string>
     <string name="exit">Вы действительно хотите выйти?</string>
     <string name="yes">Да</string>
@@ -15,7 +15,7 @@
     <string name="image">Картинка</string>
     <string name="all_films">Фильмы</string>
     <string name="watchlaterimage" translatable="false">watchLaterImage</string>
-    <string name="watchLater">Посмотреть позже</string>
+    <string name="watchLater">Напоминания</string>
     <string name="channelName" translatable="false">Films Channel</string>
     <string name="channelDescription" translatable="false">Films Channel description</string>
     <string name="reminderWatchFilm">Напомнить посмотреть фильм:</string>
@@ -27,4 +27,5 @@
     <string name="permissionIsDone">Разрешение Предоставлено</string>
     <string name="permissionNoGranted">Разрешение НЕ предоставлено</string>
     <string name="fileSaveInGallery">Файл сохранен в галерее</string>
+    <string name="settings">Настройки</string>
 </resources>

@@ -1,13 +1,20 @@
 package com.example.dnevtukhova.searchfilmsapp.domain
 
+import android.content.Context
+import android.util.Log
+import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsRepository
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.WATCHLATER
 import com.example.dnevtukhova.searchfilmsapp.data.api.PopularFilms
 import com.example.dnevtukhova.searchfilmsapp.data.api.ServerApi
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import io.reactivex.Flowable
 import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import testing.OpenForTesting
+import java.util.*
 import javax.inject.Inject
 
 @OpenForTesting
@@ -32,9 +39,10 @@ class FilmsInteractor @Inject constructor(
                                     it.title,
                                     it.description,
                                     it.image,
-                                    true,
-                                    true,
-                                    null
+                                    isFavorite(it.id.toString()),
+                                    isWatchLater(it.id.toString()),
+                                    getDateToWatchValue(it.id.toString()),
+                                    it.average
                                 )
                             )
                         }
@@ -47,6 +55,42 @@ class FilmsInteractor @Inject constructor(
                     callback.onError("!!! произошла ошибка $e")
                 }
             })
+
+    }
+
+    fun getSearchFilms(
+        key: String,
+        language: String,
+        page: Int,
+        query: String,
+        callback: GetFilmsCallback
+    ) {
+        val disposable = serverApi.searchFilms(key, language, page, query)
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.newThread())
+            .subscribeBy(
+                onError = {
+                    callback.onError("!!! произошла ошибка $it")
+                },
+                onSuccess = { it ->
+                    val filmsList = mutableListOf<FilmsItem>()
+                    it.results.forEach {
+                        filmsList.add(
+                            FilmsItem(
+                                it.id,
+                                it.title,
+                                it.description,
+                                it.image,
+                                isFavorite(it.id.toString()),
+                                isWatchLater(it.id.toString()),
+                                null,
+                                it.average
+                            )
+                        )
+                    }
+                    callback.onSuccess(filmsList)
+                }
+            )
     }
 
     fun getFilms(): Flowable<List<FilmsItem>>? {
@@ -60,6 +104,7 @@ class FilmsInteractor @Inject constructor(
     interface GetFilmsCallback {
         fun onSuccess(films: Flowable<List<FilmsItem>>?)
         fun onError(error: String)
+        fun onSuccess(films: MutableList<FilmsItem>)
     }
 
     fun selectFavorite(filmsItem: FilmsItem) {
@@ -81,5 +126,59 @@ class FilmsInteractor @Inject constructor(
 
     fun setDateToWatch(watchLaterItem: FilmsItem) {
         filmsRepository.setDateToWatch(watchLaterItem)
+    }
+
+    fun removeAllFilms() {
+        filmsRepository.removeAllFilms()
+    }
+
+    fun isFavorite(id: String): Boolean {
+//        if (filmsRepository.getFilm(id.toInt()).favorite!=0) {
+            val mSettings = App.instance.applicationContext.getSharedPreferences(
+                "Settings",
+                Context.MODE_PRIVATE
+            )
+            val set = mSettings.getStringSet(NetworkConstants.FAVORITE, HashSet<String>())
+            var isTrue = true
+            for (r in set) {
+                Log.d("FAVORITE IN SET", r)
+                if (id == r) {
+                    isTrue = false
+                }
+
+            }
+            return isTrue
+//        } else return true
+    }
+
+    fun isWatchLater(id: String): Boolean {
+//        if (!filmsRepository.getFilm(id.toInt()).watchLater) {
+            val mSettings = App.instance.applicationContext.getSharedPreferences(
+                "Settings",
+                Context.MODE_PRIVATE
+            )
+            var isTrue = true
+            val set = mSettings.getStringSet(WATCHLATER, HashSet<String>())
+            for (r in set) {
+                if (id == r) {
+                    isTrue = false
+                }
+            }
+            return isTrue
+//        } else return true
+    }
+
+    fun getDateToWatchValue(id: String): Long {
+        val mSettings = App.instance.applicationContext.getSharedPreferences(
+            "Settings",
+            Context.MODE_PRIVATE
+        )
+        val value = mSettings.getLong(id, 0)
+        Log.d("VALUE_DATE_TO_WATCH", value.toString())
+        return value
+    }
+
+    fun addFilm(filmsItem: FilmsItem) {
+        filmsRepository.addFilm(filmsItem)
     }
 }

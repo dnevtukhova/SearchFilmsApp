@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -48,6 +49,8 @@ class DetailFragment : Fragment(), Injectable {
         return inflater.inflate(R.layout.fragment_detail, container, false)
     }
 
+
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progressbarLoadImage.visibility = View.INVISIBLE
@@ -77,7 +80,22 @@ class DetailFragment : Fragment(), Injectable {
                 initializeObjects(filmsDetail)
                 filmsDetailItem = filmsDetail
                 button_load_file.setOnClickListener { loadPoster() }
+                if (!filmsDetail.favorite) {
+                    imageFavoriteDetail.setImageResource(R.drawable.ic_favorite_red_48dp)
+                }
+                ratingText.text = "Рейтинг ${filmsDetail.average}"
             })
+        imageShared.setOnClickListener {
+            imageShared.animation = AnimationUtils.loadAnimation(
+                context,
+                R.anim.my_animation
+            )
+            val i = Intent(Intent.ACTION_SEND)
+            i.type = "text/plain"
+            val text = getString(R.string.invite)+" ${filmsDetailItem.title} - ${filmsDetailItem.description}"
+            i.putExtra(Intent.EXTRA_TEXT, text)
+            startActivity(i)
+            }
     }
 
     private fun loadPoster() {
