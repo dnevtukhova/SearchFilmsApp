@@ -1,16 +1,16 @@
 package com.example.dnevtukhova.searchfilmsapp.data
 
-import com.example.dnevtukhova.searchfilmsapp.data.db.FilmsDb
+import com.example.dnevtukhova.searchfilmsapp.data.db.FilmsDao
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 
-class FilmsRepository (filmsDb: FilmsDb?) {
-    var filmsDao = filmsDb?.getFilmsDao()
-    private var filmsData: Flowable<List<FilmsItem>>? = filmsDao?.getFilms()
-    private var favoriteData: Flowable<List<FilmsItem>>? = filmsDao?.getAllFavorite()
-    private var watchLaterData: Flowable<List<FilmsItem>>? = filmsDao?.getAllWatchLater()
+class FilmsRepository (filmsDao: FilmsDao) {
+   private var filmsDao = filmsDao//filmsDb?.getFilmsDao()
+    private var filmsData: Flowable<List<FilmsItem>>? = filmsDao.getFilms()
+    private var favoriteData: Flowable<List<FilmsItem>>? = filmsDao.getAllFavorite()
+    private var watchLaterData: Flowable<List<FilmsItem>>? = filmsDao.getAllWatchLater()
 
     val films: Flowable<List<FilmsItem>>?
         get() = filmsData
@@ -21,7 +21,7 @@ class FilmsRepository (filmsDb: FilmsDb?) {
 
     fun addToCache(films: List<FilmsItem>) {
         Completable.fromRunnable {
-            filmsDao?.insertAll(films)
+            filmsDao.insertAll(films)
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()
@@ -29,7 +29,7 @@ class FilmsRepository (filmsDb: FilmsDb?) {
 
     fun setFilms(itemFilm: FilmsItem) {
         Completable.fromRunnable {
-            filmsDao?.updateFilms(itemFilm)
+            filmsDao.updateFilms(itemFilm)
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()
@@ -37,7 +37,7 @@ class FilmsRepository (filmsDb: FilmsDb?) {
 
     fun setFavorite(itemFilm: FilmsItem, favorite: Boolean) {
         Completable.fromRunnable {
-            filmsDao?.setFilms(itemFilm.id, favorite)
+            filmsDao.setFilms(itemFilm.id, favorite)
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()
@@ -45,7 +45,7 @@ class FilmsRepository (filmsDb: FilmsDb?) {
 
     fun setDateToWatch(itemFilm: FilmsItem) {
         Completable.fromRunnable {
-            filmsDao?.updateTimeToWatch(itemFilm.id, itemFilm.dateToWatch!!)
+            filmsDao.updateTimeToWatch(itemFilm.id, itemFilm.dateToWatch!!)
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()

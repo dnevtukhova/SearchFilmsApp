@@ -17,4 +17,12 @@
     <string name="all_films">Films</string>
     <string name="watchLater">Watch Later</string>
     <string name="reminderWatchFilm">Remind to watch a movie</string>
+    <string name="saveImageInGallery">Save picture in gallery</string>
+    <string name="ok">OK</string>
+    <string name="fileSaveInGallery">File is saved in the gallery</string>
+    <string name="permissionSaveFile">You must obtain permission to save the file</string>
+    <string name="getPermissionSaveFile">You must grant permission to write the file to the vault</string>
+    <string name="permissionIsDone">" Permission Granted"</string>
+    <string name="permissionNoGranted">" Permission Not Granted"</string>
+    <string name="downloadPoster">Downloap poster</string>
 </resources>

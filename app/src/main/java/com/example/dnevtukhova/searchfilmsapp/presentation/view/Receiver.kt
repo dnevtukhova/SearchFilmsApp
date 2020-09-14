@@ -25,7 +25,7 @@ class Receiver : BroadcastReceiver() {
         val builder = NotificationCompat.Builder(context!!, FilmsListFragment.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifications_active_white_24dp)
             .setContentTitle(filmsItem!!.title)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setStyle(NotificationCompat.BigTextStyle().bigText(filmsItem.description))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)

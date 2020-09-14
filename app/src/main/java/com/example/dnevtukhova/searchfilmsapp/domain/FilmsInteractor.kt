@@ -7,8 +7,10 @@ import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import io.reactivex.Flowable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import testing.OpenForTesting
 import javax.inject.Inject
 
+@OpenForTesting
 class FilmsInteractor @Inject constructor(
     val serverApi: ServerApi,
     val filmsRepository: FilmsRepository
@@ -61,13 +63,8 @@ class FilmsInteractor @Inject constructor(
     }
 
     fun selectFavorite(filmsItem: FilmsItem) {
-        if (filmsItem.favorite) {
-            filmsItem.favorite = false
-            filmsRepository.setFilms(filmsItem)
-        } else {
-            filmsItem.favorite = true
-            filmsRepository.setFilms(filmsItem)
-        }
+        filmsItem.favorite = !filmsItem.favorite
+        filmsRepository.setFilms(filmsItem)
     }
 
     fun changeFavorite(favoriteItem: FilmsItem, favorite: Boolean) {
