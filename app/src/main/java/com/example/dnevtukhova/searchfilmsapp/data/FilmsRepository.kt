@@ -6,8 +6,8 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 
-class FilmsRepository (filmsDao: FilmsDao) {
-   private var filmsDao = filmsDao//filmsDb?.getFilmsDao()
+class FilmsRepository(filmsDao: FilmsDao) {
+    private var filmsDao = filmsDao
     private var filmsData: Flowable<List<FilmsItem>>? = filmsDao.getFilms()
     private var favoriteData: Flowable<List<FilmsItem>>? = filmsDao.getAllFavorite()
     private var watchLaterData: Flowable<List<FilmsItem>>? = filmsDao.getAllWatchLater()
@@ -22,6 +22,18 @@ class FilmsRepository (filmsDao: FilmsDao) {
     fun addToCache(films: List<FilmsItem>) {
         Completable.fromRunnable {
             filmsDao.insertAll(films)
+        }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
+    }
+
+    fun getFilm(id: Int): FilmsItem {
+        return filmsDao.getFilm(id)
+    }
+
+    fun addFilm(filmsItem: FilmsItem) {
+        Completable.fromRunnable {
+            filmsDao.insert(filmsItem)
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()
@@ -46,6 +58,14 @@ class FilmsRepository (filmsDao: FilmsDao) {
     fun setDateToWatch(itemFilm: FilmsItem) {
         Completable.fromRunnable {
             filmsDao.updateTimeToWatch(itemFilm.id, itemFilm.dateToWatch!!)
+        }
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
+    }
+
+    fun removeAllFilms() {
+        Completable.fromRunnable {
+            filmsDao?.removeAllFilms()
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()

@@ -11,50 +11,93 @@
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/bgColor"
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <androidx.cardview.widget.CardView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/description"
-                    style="@style/SearchFilmDescription"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp" />
+                android:layout_margin="8dp"
+                android:background="?attr/bottomNavigationBg">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <CheckBox
-                        android:id="@+id/checkbox_like"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                    android:background="?attr/bottomNavigationBg"
+                    android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/description"
                         style="@style/SearchFilmDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/like" />
-                </LinearLayout>
+                        android:layout_margin="10dp"
+                        android:textColor="?attr/textColor" />
 
-                <EditText
-                    android:id="@+id/edit_text"
-                    android:layout_width="match_parent"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/bottomNavigationBg"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_star_yellow_36dp"
+                            tools:ignore="ContentDescription" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_star_yellow_36dp"
+                            tools:ignore="ContentDescription" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_star_yellow_36dp"
+                            tools:ignore="ContentDescription" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/ratingText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:textColor="?attr/textColor"
+                        android:textSize="20sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/imageFavoriteDetail"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="@string/comment" />
+                    android:layout_margin="10dp"
+                    android:src="@drawable/ic_favorite_border_black_48dp"
+                    tools:ignore="ContentDescription" />
+
+                <ImageView
+                    android:id="@+id/imageShared"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:src="@drawable/ic_share_black_48dp"
+                    tools:ignore="ContentDescription" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.appbar.AppBarLayout
@@ -94,26 +137,27 @@
 
                 <Button
                     android:id="@+id/button_load_file"
+                    style="@style/SearchFilmButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
+                    android:background="#60000000"
                     android:drawableLeft="@drawable/ic_get_app_white_48dp"
                     android:text="@string/downloadPoster"
                     android:textSize="10sp"
-                    style="@style/SearchFilmButton"
                     app:layout_constraintBottom_toBottomOf="@id/image_detail_view"
                     app:layout_constraintRight_toRightOf="@id/image_detail_view"
-                    android:background="#60000000"
-                    tools:ignore="SmallSp"/>
+                    tools:ignore="RtlHardcoded,SmallSp" />
+
                 <ProgressBar
                     android:id="@+id/progressbarLoadImage"
+                    style="@android:style/Widget.Material.ProgressBar.Small"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    style="@android:style/Widget.Material.ProgressBar.Small"
                     android:scaleX="0.1"
                     android:scaleY="0.1"
-                    app:layout_constraintTop_toTopOf="@id/button_load_file"
-                    app:layout_constraintLeft_toLeftOf="@id/button_load_file"/>
+                    app:layout_constraintLeft_toLeftOf="@id/button_load_file"
+                    app:layout_constraintTop_toTopOf="@id/button_load_file" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.Toolbar
@@ -123,5 +167,7 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

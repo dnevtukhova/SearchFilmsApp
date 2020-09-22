@@ -7,37 +7,33 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import android.widget.*
+import android.view.*
+import android.widget.AbsListView
+import android.widget.DatePicker
+import android.widget.SearchView
+import android.widget.TimePicker
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.edit
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PAGE_NUMBER
-import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.example.dnevtukhova.searchfilmsapp.di.Injectable
+import com.example.dnevtukhova.searchfilmsapp.presentation.view.adapter.FilmsAdapter
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.DetailFragmentViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FilmsListViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_film_list.*
-import testing.OpenClass
-import testing.OpenForTesting
 import java.util.*
 import javax.inject.Inject
 
@@ -46,15 +42,15 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     var listener: FilmsListListener? = null
     private lateinit var recycler: RecyclerView
     lateinit var adapterFilms: FilmsAdapter
+    lateinit var adapterFilmsForSearch: FilmsAdapter
+
     @Inject
     lateinit var filmsViewModelFactory: ViewModelProvider.Factory
-
     lateinit var filmsViewModel: FilmsListViewModel
-//    by viewModels {
-//         filmsViewModelFactory
-//     }
+    lateinit var layoutManager: LinearLayoutManager
+    var isScrolling: Boolean = false
     lateinit var detailViewModel: DetailFragmentViewModel
-
+    lateinit var searchView: SearchView
     private val calendar: Calendar = Calendar.getInstance()
     private var pIntentOnce: PendingIntent? = null
     private var am: AlarmManager? = null
@@ -82,39 +78,57 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         createNotificationChannel()
-        initRecycler(view, progressbar)
+
+        initRecycler(view)
+
         filmsViewModel = ViewModelProvider(
             requireActivity(),
             filmsViewModelFactory
         ).get(FilmsListViewModel::class.java)
+
         filmsViewModel.films?.observe(
             this.viewLifecycleOwner,
             Observer<List<FilmsItem>> { films ->
                 filmsViewModel.initSharedPref()
                 adapterFilms.setItems(films)
             })
+
         filmsViewModel.error.observe(
             this.viewLifecycleOwner,
             Observer<String> { error ->
-                if (progressbar != null) {
-                    progressbar.visibility = View.GONE
-                }
                 requireView().showSnackbar("Ошибка $error", Snackbar.LENGTH_LONG, "Обновить") {
                     filmsViewModel.refreshAllFilms()
                 }
             })
-        swipeRefreshLayout.setOnRefreshListener {
-            if (progressbar != null) {
-                progressbar.visibility = View.GONE
+
+        filmsViewModel.searchFilms?.observe(
+            this.viewLifecycleOwner,
+            Observer<MutableList<FilmsItem>> { films ->
+                adapterFilmsForSearch.setItems(films)
+            })
+
+        filmsViewModel.progressBar.observe(
+            this.viewLifecycleOwner,
+            Observer<Boolean> { it ->
+                if (progressbar != null) {
+                    if (it) {
+                        progressbar.isVisible = true
+                    } else {
+                        progressbar.isGone = true
+                    }
+                }
             }
+        )
+
+        swipeRefreshLayout.setOnRefreshListener {
             filmsViewModel.mSettings.edit {
                 putInt(PAGE_NUMBER, 1)
             }.apply { }
+            filmsViewModel.removeAllFilms()
             filmsViewModel.refreshAllFilms()
             swipeRefreshLayout.isRefreshing = false
         }
         am = getSystemService(requireContext(), AlarmManager::class.java)
-
         detailViewModel = ViewModelProvider(
             requireActivity(),
             filmsViewModelFactory
@@ -123,6 +137,7 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         retainInstance = true
     }
 
@@ -134,13 +149,12 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     protected open fun injectMembers() =
         AndroidSupportInjection.inject(this)
 
-    private fun initRecycler(view: View, progressBar: ProgressBar) {
+    private fun initRecycler(view: View) {
         recycler = view.findViewById(R.id.recyclerViewFragment)
-        val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         recycler.layoutManager = layoutManager
         adapterFilms =
             FilmsAdapter(
-                progressBar,
                 requireContext(),
                 LayoutInflater.from(context),
                 object :
@@ -149,7 +163,6 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         detailViewModel.selectFilm(filmsItem)
                         listener?.onFilmsSelected(filmsItem)
                     }
-
                     override fun onFavouriteClick(filmsItem: FilmsItem, position: Int) {
                         Log.d(
                             TAG,
@@ -191,20 +204,20 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (layoutManager.findLastVisibleItemPosition() == layoutManager.itemCount - 2) {
-                    val page = filmsViewModel.mSettings.getInt(PAGE_NUMBER, 0)
-                    Log.d("page", "$page")
-                    val page2 = page + 1
-                    filmsViewModel.mSettings.edit { putInt(PAGE_NUMBER, page2) }.apply {
-                    }
-                    Log.d("page2", "$page2")
-                    filmsViewModel.refreshAllFilms()
-                    recycler.post {
-                        adapterFilms.notifyItemRangeChanged(
-                            layoutManager.itemCount,
-                            20
-                        )
-                    }
+                super.onScrolled(recyclerView, dx, dy)
+                val currentItems = layoutManager.childCount
+                val totalItems = layoutManager.itemCount
+                val scrollOutItems = layoutManager.findLastVisibleItemPosition()
+                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
+                    isScrolling = false
+                    fetchData()
+                }
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    isScrolling = true
                 }
             }
         })
@@ -215,95 +228,45 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             R.drawable.white_line
         )?.let { itemDecoration.setDrawable(it) }
         recycler.addItemDecoration(itemDecoration)
+
+        //for search
+        val layoutManagerSearch = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerViewFragmentSearch.layoutManager = layoutManagerSearch
+        adapterFilmsForSearch = FilmsAdapter(
+            requireContext(),
+            LayoutInflater.from(context),
+            object : FilmsAdapter.OnFilmsClickListener {
+                override fun onFilmsClick(filmsItem: FilmsItem, position: Int) {
+                    detailViewModel.selectFilm(filmsItem)
+                    listener?.onFilmsSelected(filmsItem)
+                }
+                override fun onFavouriteClick(filmsItem: FilmsItem, position: Int) {
+                }
+                @RequiresApi(Build.VERSION_CODES.M)
+                override fun onWatchLaterClick(filmsItem: FilmsItem, position: Int) {
+                }
+            })
+        recyclerViewFragmentSearch.adapter = adapterFilmsForSearch
+        recyclerViewFragmentSearch.addItemDecoration(itemDecoration)
+    }
+
+    private fun fetchData() {
+        val page = filmsViewModel.mSettings.getInt(PAGE_NUMBER, 0)
+        Log.d("page", "$page")
+        val page2 = page + 1
+        filmsViewModel.mSettings.edit { putInt(PAGE_NUMBER, page2) }.apply {
+        }
+        filmsViewModel.refreshAllFilms()
+        recycler.post {
+            adapterFilms.notifyItemRangeChanged(
+                layoutManager.itemCount,
+                20)
+        }
     }
 
     interface FilmsListListener {
         fun onFilmsSelected(filmsItem: FilmsItem)
     }
-
-    //region adapter and holder
-    class FilmsItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val titleTv: TextView = itemView.findViewById(R.id.titleTv)
-        private val subtitleTv: TextView = itemView.findViewById(R.id.descriptionFilm)
-        private val imageFilm: ImageView = itemView.findViewById(R.id.image)
-        private val imageFavourite: ImageView = itemView.findViewById(R.id.imageFavourite)
-        private val imageWatchLater: ImageView = itemView.findViewById(R.id.watchLater)
-        var container: ConstraintLayout = itemView.findViewById(R.id.container)
-
-        fun bind(item: FilmsItem) {
-            titleTv.text = item.title
-            subtitleTv.text = item.description
-            Glide.with(imageFilm.context)
-                .load(PICTURE + item.image)
-                .placeholder(R.drawable.ic_photo_black_24dp)
-                .error(R.drawable.ic_error_outline_black_24dp)
-                .centerCrop()
-                .transform(RoundedCorners(30))
-                .into(imageFilm)
-
-            if (item.favorite) {
-                imageFavourite.setImageResource(R.drawable.ic_favorite_border_black_24dp)
-            } else {
-                imageFavourite.setImageResource(R.drawable.ic_favorite_red_24dp)
-            }
-            if (item.watchLater) {
-                imageWatchLater.setImageResource(R.drawable.ic_notifications_none_black_24dp)
-            } else {
-                imageWatchLater.setImageResource(R.drawable.ic_notifications_burgundy_24dp)
-            }
-        }
-    }
-@OpenForTesting
-    class FilmsAdapter(
-        private val progressBar: ProgressBar,
-        private val context: Context,
-        private val inflater: LayoutInflater,
-        private val listener: OnFilmsClickListener
-    ) :
-        RecyclerView.Adapter<FilmsItemViewHolder>() {
-        private val items = ArrayList<FilmsItem>()
-
-        fun setItems(films: List<FilmsItem>) {
-            items.clear()
-            items.addAll(films)
-            progressBar.visibility = View.GONE
-            notifyDataSetChanged()
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmsItemViewHolder {
-            return FilmsItemViewHolder(
-                inflater.inflate(
-                    R.layout.item_news,
-                    parent,
-                    false
-                )
-            )
-        }
-
-        override fun getItemCount() = items.size
-
-        override fun onBindViewHolder(holder: FilmsItemViewHolder, position: Int) {
-            holder.container.animation =
-                AnimationUtils.loadAnimation(
-                    context,
-                    R.anim.my_animation
-                )
-            val item = items[position]
-            holder.bind(item)
-            holder.itemView.setOnClickListener { listener.onFilmsClick(item, position) }
-            val imageFavourite: ImageView = holder.itemView.findViewById(R.id.imageFavourite)
-            imageFavourite.setOnClickListener { listener.onFavouriteClick(item, position) }
-            val imageWatchLater: ImageView = holder.itemView.findViewById(R.id.watchLater)
-            imageWatchLater.setOnClickListener { listener.onWatchLaterClick(item, position) }
-        }
-
-        interface OnFilmsClickListener {
-            fun onFilmsClick(filmsItem: FilmsItem, position: Int)
-            fun onFavouriteClick(filmsItem: FilmsItem, position: Int)
-            fun onWatchLaterClick(filmsItem: FilmsItem, position: Int)
-        }
-    }
-    //endregion
 
     @SuppressLint("ResourceAsColor")
     @RequiresApi(Build.VERSION_CODES.M)
@@ -341,8 +304,10 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         Log.d(TAG, "setAlarm")
         dateNotification = calendar.timeInMillis
         myFilmsItem!!.dateToWatch = dateNotification
+        filmsViewModel.addFilm(myFilmsItem!!)
         filmsViewModel.changeWatchLater(myFilmsItem!!)
         adapterFilms.notifyItemChanged(myPosition!!)
+        adapterFilmsForSearch.notifyDataSetChanged()
         pIntentOnce =
             PendingIntent.getBroadcast(
                 requireContext(),
@@ -372,11 +337,71 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(CHANNEL_ID, name, importance)
             channel.description = description
-
             val notificationManager =
                 requireActivity().getSystemService(NotificationManager::class.java)
             notificationManager!!.createNotificationChannel(channel)
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.films_menu, menu)
+        val searchItem: MenuItem = menu.findItem(R.id.action_search)
+        val searchManager =
+            requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        searchView = searchItem.actionView as SearchView
+        searchView.setOnClickListener {
+            searchView.isIconified = false
+        }
+        searchView.clearFocus()
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                Log.i("onQueryTextSubmit", query)
+                filmsViewModel.getFilmsFromSearch(query!!)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                Log.i("onQueryTextChange", newText)
+                if (newText!!.length > 2) {
+                    recycler.isVisible = false
+                    recyclerViewFragmentSearch.isVisible = true
+                }
+                filmsViewModel.getFilmsFromSearch(newText)
+                adapterFilmsForSearch.notifyDataSetChanged()
+                if (newText.isEmpty()) {
+                    recycler.isVisible = true
+                    recyclerViewFragmentSearch.isVisible = false
+                }
+                return false
+            }
+        })
+        searchView.setOnCloseListener {
+            recyclerViewFragmentSearch.isVisible = false
+            recycler.isVisible = true
+            true
+        }
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.settings -> {
+                requireActivity().supportFragmentManager
+                    .beginTransaction()
+                    .replace(
+                        R.id.fragmentContainer,
+                        SettingsFragment(),
+                        SettingsFragment.TAG
+                    )
+                    .addToBackStack(SettingsFragment.TAG)
+                    .commit()
+
+                return false
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 }

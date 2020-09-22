@@ -19,7 +19,8 @@ import kotlinx.android.parcel.Parcelize
     var image: String?,
     var favorite: Boolean,
     var watchLater: Boolean,
-    var dateToWatch: Long?): Parcelable {
+    var dateToWatch: Long?,
+    var average: Float): Parcelable {
     @IgnoredOnParcel
     @PrimaryKey(autoGenerate = true)
     var idFilms = 0

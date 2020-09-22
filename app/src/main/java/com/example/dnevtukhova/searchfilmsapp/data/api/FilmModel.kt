@@ -6,5 +6,6 @@ data class FilmModel(
     @SerializedName("id") val id: Int,
     @SerializedName("title") val title: String,
     @SerializedName("overview") val description: String,
-    @SerializedName("poster_path") val image: String
+    @SerializedName("poster_path") val image: String,
+    @SerializedName("vote_average") val average: Float
 )

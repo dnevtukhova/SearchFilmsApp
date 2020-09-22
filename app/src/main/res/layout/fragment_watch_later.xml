@@ -17,5 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:itemCount="33"
-        tools:listitem="@layout/item_news" />
+        tools:listitem="@layout/item_film"
+        android:background="?attr/bgColor"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

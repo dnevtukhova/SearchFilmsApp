@@ -30,11 +30,12 @@ import javax.inject.Inject
 
 class FavoriteFragment : Fragment(), Injectable {
     var listener: FilmsFavoriteAdapter.OnFavoriteFilmsClickListener? = null
+
     @Inject
     lateinit var filmsViewModelFactory: ViewModelProvider.Factory
-     val favoriteViewModel: FavoriteFragmentViewModel by viewModels {
-         filmsViewModelFactory
-     }
+    val favoriteViewModel: FavoriteFragmentViewModel by viewModels {
+        filmsViewModelFactory
+    }
     lateinit var detailViewModel: DetailFragmentViewModel
     private lateinit var adapterFavoriteFilms: FilmsFavoriteAdapter
 
@@ -55,7 +56,9 @@ class FavoriteFragment : Fragment(), Injectable {
         initRecycler(view)
         favoriteViewModel.favoriteFilms?.observe(
             this.viewLifecycleOwner,
-            Observer<List<FilmsItem>> { films -> adapterFavoriteFilms.setItems(films) })
+            Observer<List<FilmsItem>> { films ->
+                adapterFavoriteFilms.setItems(films)
+            })
 
         detailViewModel = ViewModelProvider(
             requireActivity(),
@@ -103,6 +106,7 @@ class FavoriteFragment : Fragment(), Injectable {
         )
             ?.let { itemDecoration.setDrawable(it) }
         recycler.addItemDecoration(itemDecoration)
+        adapterFavoriteFilms.notifyDataSetChanged()
     }
 
     //region adapter and holder
@@ -145,7 +149,7 @@ class FavoriteFragment : Fragment(), Injectable {
         ): FilmsFavouriteItemViewHolder {
             return FilmsFavouriteItemViewHolder(
                 inflater.inflate(
-                    R.layout.item_news,
+                    R.layout.item_film,
                     parent,
                     false
                 )

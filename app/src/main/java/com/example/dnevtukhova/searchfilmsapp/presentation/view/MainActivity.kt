@@ -2,22 +2,21 @@ package com.example.dnevtukhova.searchfilmsapp.presentation.view
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Intent
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import javax.inject.Inject
+
 
 class MainActivity : AppCompatActivity(),
     FilmsListFragment.FilmsListListener,
@@ -35,7 +34,14 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+        val mSettings = App.instance.applicationContext.getSharedPreferences(
+            "Settings",
+            Context.MODE_PRIVATE
+        )
+        val theme = mSettings.getBoolean(NetworkConstants.THEME, true)
+        if (theme) {
+            setTheme(R.style.LightTheme)
+        } else {
             setTheme(R.style.DarkTheme)
         }
         filmsItem = intent.getParcelableExtra(FILM_FROM_NOTIFICATION)
@@ -71,12 +77,21 @@ class MainActivity : AppCompatActivity(),
                     )
                     .commit()
             }
+        } else if (App.settingsF) {
+            App.settingsF = false
+            supportFragmentManager
+                .beginTransaction()
+                .replace(
+                    R.id.fragmentContainer,
+                    FilmsListFragment(),
+                    FilmsListFragment.TAG
+                )
+                .commit()
         } else {
             showExitDialog()
         }
     }
 
-    @SuppressLint("ResourceAsColor")
     private fun showExitDialog() {
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.custom_dialog)
@@ -119,42 +134,16 @@ class MainActivity : AppCompatActivity(),
         openDetailed()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.films_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            R.id.invite_friend -> {
-                val i = Intent(Intent.ACTION_SEND)
-                i.type = "text/plain"
-                i.putExtra(Intent.EXTRA_TEXT, getString(R.string.invite))
-                startActivity(i)
-            }
-            R.id.app_theme -> {
-                if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                }
-                finish()
-                startActivity(Intent(applicationContext, MainActivity::class.java))
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun setBottomNavigation() {
         val bar: BottomNavigationView = findViewById(R.id.bottomNavigation)
         bar.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.film_favorite -> {
-                    supportActionBar?.show()
+                    //  supportActionBar?.show()
                     App.favoriteF = true
                     App.listF = false
                     App.watchLaterF = false
+                    App.settingsF = false
                     supportFragmentManager
                         .beginTransaction()
                         .replace(
@@ -165,9 +154,11 @@ class MainActivity : AppCompatActivity(),
                         .commit()
                 }
                 R.id.all_films -> {
+                    supportActionBar?.show()
                     App.listF = true
                     App.favoriteF = false
                     App.watchLaterF = false
+                    App.settingsF = false
                     supportFragmentManager
                         .beginTransaction()
                         .replace(
@@ -182,6 +173,7 @@ class MainActivity : AppCompatActivity(),
                     App.listF = false
                     App.favoriteF = false
                     App.watchLaterF = true
+                    App.settingsF = false
                     supportFragmentManager
                         .beginTransaction()
                         .replace(

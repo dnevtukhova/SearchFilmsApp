@@ -1,5 +1,4 @@
 <resources>
-
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
@@ -28,8 +27,20 @@
     </style>
 
     <style name="DarkTheme" parent="AppTheme">
-        <item name="colorPrimary">#000000</item>
-        <item name="colorPrimaryDark">#aeaeae</item>
-        <item name="colorAccent">#ffffff</item>
+        <item name="bgColor">#000000</item>
+        <item name="textColor">#aeaeae</item>
+        <item name="metaTextColor">#ffffff</item>
+        <item name="bottomNavigationBg">#221D1D</item>
+        <item name="bottomNavigationIcon">#ffffff</item>
+        <item name="decorationLine">#3A3838</item>
+    </style>
+
+    <style name="LightTheme" parent="AppTheme">
+        <item name="bgColor">@color/grayLight</item>
+        <item name="textColor">@color/colorGray</item>
+        <item name="metaTextColor">#000000</item>
+        <item name="bottomNavigationBg">#ffffff</item>
+        <item name="bottomNavigationIcon">@color/colorGray</item>
+        <item name="decorationLine">#ffffff</item>
     </style>
 </resources>
