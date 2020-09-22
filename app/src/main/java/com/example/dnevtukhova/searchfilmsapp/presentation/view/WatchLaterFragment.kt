@@ -80,7 +80,6 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             FilmsWatchLaterAdapter(
                 requireContext(),
                 LayoutInflater.from(context),
-                //по долгому клику удаление элемента
                 object :
                     FilmsWatchLaterAdapter.OnWatchLaterFilmsClickListener {
                     @RequiresApi(Build.VERSION_CODES.M)
@@ -209,7 +208,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         ): FilmsWatchLaterViewHolder {
             return FilmsWatchLaterViewHolder(
                 inflater.inflate(
-                    R.layout.item_news,
+                    R.layout.item_film,
                     parent,
                     false
                 )

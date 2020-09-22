@@ -6,8 +6,8 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 
-class FilmsRepository (filmsDao: FilmsDao) {
-   private var filmsDao = filmsDao//filmsDb?.getFilmsDao()
+class FilmsRepository(filmsDao: FilmsDao) {
+    private var filmsDao = filmsDao
     private var filmsData: Flowable<List<FilmsItem>>? = filmsDao.getFilms()
     private var favoriteData: Flowable<List<FilmsItem>>? = filmsDao.getAllFavorite()
     private var watchLaterData: Flowable<List<FilmsItem>>? = filmsDao.getAllWatchLater()
@@ -27,11 +27,11 @@ class FilmsRepository (filmsDao: FilmsDao) {
             .subscribe()
     }
 
-    fun getFilm (id: Int): FilmsItem {
+    fun getFilm(id: Int): FilmsItem {
         return filmsDao.getFilm(id)
     }
 
-    fun addFilm (filmsItem: FilmsItem) {
+    fun addFilm(filmsItem: FilmsItem) {
         Completable.fromRunnable {
             filmsDao.insert(filmsItem)
         }

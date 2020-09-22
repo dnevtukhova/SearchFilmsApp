@@ -2,12 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/settings"
-        android:icon="@drawable/ic_settings_white_24dp"
-        app:showAsAction="ifRoom"
-        android:title="@string/settings"
-        />
-    <item
         android:id="@+id/all_films"
         android:icon="@drawable/ic_live_tv_white_24dp"
         app:showAsAction="ifRoom"

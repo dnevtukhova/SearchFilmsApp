@@ -1,22 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<!--     <item-->
-<!--        android:id="@+id/invite_friend"-->
-<!--        android:icon="@drawable/ic_share_black_24dp"-->
-<!--        android:title="@string/menuInviteFriends"-->
-<!--        app:showAsAction="ifRoom" />-->
-<!--    <item-->
-<!--        android:id="@+id/app_theme"-->
-<!--        android:icon="@drawable/ic_brightness_4_black_24dp"-->
-<!--        android:title="@string/menuTheme"-->
-<!--        app:showAsAction="ifRoom" />-->
     <item
         android:id="@+id/action_search"
         android:title="@android:string/search_go"
         android:icon="@drawable/ic_search_white_24dp"
         app:showAsAction="always|collapseActionView"
        app:actionViewClass="android.widget.SearchView"/>
-<!--    // app:actionViewClass="androidx.appcompat.widget.SearchView" />-->
-
+  <item
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_settings_white_24dp"
+        android:title="@string/settings"
+        app:showAsAction="always"/>
 </menu>

@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
@@ -34,11 +33,7 @@ const val PERMISSION_REQUEST_WRITE_STORAGE = 0
 class DetailFragment : Fragment(), Injectable {
     @Inject
     lateinit var filmsViewModelFactory: FilmsViewModelFactory
-
     lateinit var detailViewViewModel: DetailFragmentViewModel
-//            by viewModels {
-//        filmsViewModelFactory
-//    }
     private lateinit var filmsDetailItem: FilmsItem
 
     override fun onCreateView(
@@ -92,10 +87,11 @@ class DetailFragment : Fragment(), Injectable {
             )
             val i = Intent(Intent.ACTION_SEND)
             i.type = "text/plain"
-            val text = getString(R.string.invite)+" ${filmsDetailItem.title} - ${filmsDetailItem.description}"
+            val text =
+                getString(R.string.invite) + " ${filmsDetailItem.title} - ${filmsDetailItem.description}"
             i.putExtra(Intent.EXTRA_TEXT, text)
             startActivity(i)
-            }
+        }
     }
 
     private fun loadPoster() {
@@ -149,7 +145,6 @@ class DetailFragment : Fragment(), Injectable {
                     PERMISSION_REQUEST_WRITE_STORAGE
                 )
             }
-
         } else {
             requireView().showSnackbar(
                 R.string.getPermissionSaveFile,
@@ -170,7 +165,6 @@ class DetailFragment : Fragment(), Injectable {
                 loadPoster()
             } else {
                 requireView().showSnackbar(R.string.permissionNoGranted, Snackbar.LENGTH_SHORT)
-
             }
         }
     }

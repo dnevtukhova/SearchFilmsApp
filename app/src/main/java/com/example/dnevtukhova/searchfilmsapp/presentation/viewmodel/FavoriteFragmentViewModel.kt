@@ -9,8 +9,8 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class FavoriteFragmentViewModel @Inject constructor(val filmsInteractor: FilmsInteractor) : ViewModel() {
-    private val favoriteLiveData: LiveData<List<FilmsItem>>? =
-        LiveDataReactiveStreams.fromPublisher(filmsInteractor.getFavorite()!!.subscribeOn(Schedulers.io()))
+    private val favoriteLiveData: LiveData<List<FilmsItem>> = LiveDataReactiveStreams.fromPublisher(filmsInteractor.getFavorite()!!
+        .subscribeOn(Schedulers.io()))
 
     val favoriteFilms: LiveData<List<FilmsItem>>?
         get() = favoriteLiveData

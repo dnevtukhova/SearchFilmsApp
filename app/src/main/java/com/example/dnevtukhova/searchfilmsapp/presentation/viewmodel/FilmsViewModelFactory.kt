@@ -9,11 +9,8 @@ import javax.inject.Singleton
 
 @Singleton
 class FilmsViewModelFactory @Inject constructor
-    (
-    private val viewModels: MutableMap<Class<out ViewModel>, Provider<ViewModel>>,
-    private val filmsInteractor: FilmsInteractor
-) :
-    ViewModelProvider.Factory {
+    (private val viewModels: MutableMap<Class<out ViewModel>, Provider<ViewModel>>,
+    private val filmsInteractor: FilmsInteractor) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return modelClass.getConstructor(FilmsInteractor::class.java)
             .newInstance(filmsInteractor)

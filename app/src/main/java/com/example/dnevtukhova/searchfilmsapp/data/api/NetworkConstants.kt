@@ -9,4 +9,5 @@ object NetworkConstants {
     const val PAGE_NUMBER = "page number"
     const val FAVORITE = "favorite"
     const val WATCHLATER = "watchlater"
+    const val THEME = "theme"
 }

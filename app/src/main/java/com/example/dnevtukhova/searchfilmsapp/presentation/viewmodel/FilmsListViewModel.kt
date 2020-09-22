@@ -26,9 +26,12 @@ import javax.inject.Inject
 @OpenForTesting
 class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteractor) : ViewModel() {
     private var filmsLiveData: LiveData<List<FilmsItem>> =
-        LiveDataReactiveStreams.fromPublisher(filmsInteractor.getFilms()!!.subscribeOn(Schedulers.io()))
+        LiveDataReactiveStreams.fromPublisher(
+            filmsInteractor.getFilms()!!.subscribeOn(Schedulers.io())
+        )
     private val errorLiveData = SingleLiveEvent<String>()
     private val filmsSearchLiveData = MutableLiveData<MutableList<FilmsItem>>()
+    private val progressBarLiveData = MutableLiveData<Boolean>()
     lateinit var mSettings: SharedPreferences
 
     init {
@@ -42,32 +45,35 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
         get() = errorLiveData
 
     val searchFilms: MutableLiveData<MutableList<FilmsItem>>?
-    get() = filmsSearchLiveData
+        get() = filmsSearchLiveData
 
-//    val settings: SharedPreferences
-//        get() = mSettings
+    val progressBar: MutableLiveData<Boolean>
+        get() = progressBarLiveData
 
     fun refreshAllFilms() {
+        progressBarLiveData.postValue(true)
         filmsInteractor.getFilms(
             API_KEY,
             LANGUAGE,
             mSettings.getInt(PAGE_NUMBER, 0),
             object : FilmsInteractor.GetFilmsCallback {
                 override fun onSuccess(films: Flowable<List<FilmsItem>>?) {
-
+                    progressBarLiveData.postValue(false)
                 }
 
                 override fun onSuccess(films: MutableList<FilmsItem>) {
-                  //  filmsLiveData.
+                    progressBarLiveData.postValue(false)
                 }
 
                 override fun onError(error: String) {
+                    progressBarLiveData.postValue(false)
                     errorLiveData.postValue(error)
                 }
             })
     }
 
     fun getFilmsFromSearch(query: String) {
+        progressBarLiveData.postValue(true)
         filmsInteractor.getSearchFilms(
             API_KEY,
             LANGUAGE,
@@ -75,19 +81,19 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
             query,
             object : FilmsInteractor.GetFilmsCallback {
                 override fun onSuccess(films: Flowable<List<FilmsItem>>?) {
-                    TODO("Not yet implemented")
+                    progressBarLiveData.postValue(false)
                 }
 
                 override fun onSuccess(films: MutableList<FilmsItem>) {
                     filmsSearchLiveData.postValue(films)
+                    progressBarLiveData.postValue(false)
                 }
 
                 override fun onError(error: String) {
-                   errorLiveData.postValue(error)
+                    progressBarLiveData.postValue(false)
+                    errorLiveData.postValue(error)
                 }
-
             }
-
         )
     }
 
@@ -97,21 +103,20 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
             "Settings",
             Context.MODE_PRIVATE
         )
-        if(!filmsItem.favorite)
-        {
-           val set =  mSettings.getStringSet(FAVORITE, HashSet<String>())
+        if (!filmsItem.favorite) {
+            val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
             set.add(filmsItem.id.toString())
             Log.d("set size", set.size.toString())
-            mSettings.edit{putStringSet(FAVORITE, set)}
+            mSettings.edit { putStringSet(FAVORITE, set) }
 
-        }
-        else {
-            var set =  mSettings.getStringSet(FAVORITE, HashSet<String>())
+        } else {
+            val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
             Log.d("set size delete", set.toString())
             set.remove(filmsItem.id.toString())
             Log.d("set size delete", set.size.toString())
-            val e = mSettings.edit{putStringSet(FAVORITE, set)}
-
+            mSettings.edit {
+                putStringSet(FAVORITE, set)
+            }
         }
     }
 
@@ -121,17 +126,15 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
             "Settings",
             Context.MODE_PRIVATE
         )
-        if(!filmsItem.favorite)
-        {
-            val set =  mSettings.getStringSet(WATCHLATER, HashSet<String>())
+        if (!filmsItem.favorite) {
+            val set = mSettings.getStringSet(WATCHLATER, HashSet<String>())
             set.add(filmsItem.id.toString())
-            mSettings.edit{putStringSet(WATCHLATER, set)}
-            mSettings.edit {putLong(filmsItem.id.toString(),filmsItem.dateToWatch!! )}
-        }
-        else {
-            val set =  mSettings.getStringSet(WATCHLATER, HashSet<String>())
+            mSettings.edit { putStringSet(WATCHLATER, set) }
+            mSettings.edit { putLong(filmsItem.id.toString(), filmsItem.dateToWatch!!) }
+        } else {
+            val set = mSettings.getStringSet(WATCHLATER, HashSet<String>())
             set.remove(filmsItem.id.toString())
-            mSettings.edit {putStringSet(WATCHLATER, set)}
+            mSettings.edit { putStringSet(WATCHLATER, set) }
         }
 
     }
@@ -139,6 +142,7 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
     fun removeAllFilms() {
         filmsInteractor.removeAllFilms()
     }
+
     fun addFilm(filmsItem: FilmsItem) {
         filmsInteractor.addFilm(filmsItem)
     }
@@ -163,7 +167,6 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
             removeAllFilms()
             refreshAllFilms()
         }
-
     }
 
     companion object {

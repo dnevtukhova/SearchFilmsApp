@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -15,31 +14,26 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
-import com.example.dnevtukhova.searchfilmsapp.presentation.view.FilmsListFragment
 import testing.OpenForTesting
-import java.util.ArrayList
+import java.util.*
 
 @OpenForTesting
 class FilmsAdapter(
-    private val progressBar: ProgressBar,
     private val context: Context,
     private val inflater: LayoutInflater,
-    private val listener: OnFilmsClickListener
-) :
-    RecyclerView.Adapter<FilmsItemViewHolder>() {
+    private val listener: OnFilmsClickListener): RecyclerView.Adapter<FilmsItemViewHolder>() {
     private val items = ArrayList<FilmsItem>()
 
     fun setItems(films: List<FilmsItem>) {
         items.clear()
         items.addAll(films)
-        progressBar.visibility = View.GONE
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmsItemViewHolder {
         return FilmsItemViewHolder(
             inflater.inflate(
-                R.layout.item_news,
+                R.layout.item_film,
                 parent,
                 false
             )

@@ -2,9 +2,11 @@ package com.example.dnevtukhova.searchfilmsapp.domain
 
 import android.content.Context
 import android.util.Log
+import androidx.core.content.edit
 import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsRepository
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants
+import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.FAVORITE
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.WATCHLATER
 import com.example.dnevtukhova.searchfilmsapp.data.api.PopularFilms
 import com.example.dnevtukhova.searchfilmsapp.data.api.ServerApi
@@ -46,7 +48,6 @@ class FilmsInteractor @Inject constructor(
                                 )
                             )
                         }
-
                     filmsRepository.addToCache(filmsList)
                     callback.onSuccess(filmsRepository.films)
                 }
@@ -55,7 +56,6 @@ class FilmsInteractor @Inject constructor(
                     callback.onError("!!! произошла ошибка $e")
                 }
             })
-
     }
 
     fun getSearchFilms(
@@ -114,6 +114,18 @@ class FilmsInteractor @Inject constructor(
 
     fun changeFavorite(favoriteItem: FilmsItem, favorite: Boolean) {
         filmsRepository.setFavorite(favoriteItem, favorite)
+        val mSettings = App.instance.applicationContext.getSharedPreferences(
+            "Settings",
+            Context.MODE_PRIVATE
+        )
+        val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
+
+        if (favorite) {
+            set.remove(favoriteItem.id.toString())
+        } else {
+            set.add(favoriteItem.id.toString())
+        }
+        mSettings.edit { putStringSet(FAVORITE, set) }
     }
 
     fun getWatchLater(): Flowable<List<FilmsItem>>? {
@@ -133,39 +145,34 @@ class FilmsInteractor @Inject constructor(
     }
 
     fun isFavorite(id: String): Boolean {
-//        if (filmsRepository.getFilm(id.toInt()).favorite!=0) {
-            val mSettings = App.instance.applicationContext.getSharedPreferences(
-                "Settings",
-                Context.MODE_PRIVATE
-            )
-            val set = mSettings.getStringSet(NetworkConstants.FAVORITE, HashSet<String>())
-            var isTrue = true
-            for (r in set) {
-                Log.d("FAVORITE IN SET", r)
-                if (id == r) {
-                    isTrue = false
-                }
-
+        val mSettings = App.instance.applicationContext.getSharedPreferences(
+            "Settings",
+            Context.MODE_PRIVATE
+        )
+        val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
+        var isTrue = true
+        for (r in set) {
+            Log.d("FAVORITE IN SET", r)
+            if (id == r) {
+                isTrue = false
             }
-            return isTrue
-//        } else return true
+        }
+        return isTrue
     }
 
     fun isWatchLater(id: String): Boolean {
-//        if (!filmsRepository.getFilm(id.toInt()).watchLater) {
-            val mSettings = App.instance.applicationContext.getSharedPreferences(
-                "Settings",
-                Context.MODE_PRIVATE
-            )
-            var isTrue = true
-            val set = mSettings.getStringSet(WATCHLATER, HashSet<String>())
-            for (r in set) {
-                if (id == r) {
-                    isTrue = false
-                }
+        val mSettings = App.instance.applicationContext.getSharedPreferences(
+            "Settings",
+            Context.MODE_PRIVATE
+        )
+        var isTrue = true
+        val set = mSettings.getStringSet(WATCHLATER, HashSet<String>())
+        for (r in set) {
+            if (id == r) {
+                isTrue = false
             }
-            return isTrue
-//        } else return true
+        }
+        return isTrue
     }
 
     fun getDateToWatchValue(id: String): Long {
