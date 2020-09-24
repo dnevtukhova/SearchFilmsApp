@@ -15,6 +15,7 @@ class App : Application(), HasActivityInjector {
         var favoriteF: Boolean = false
         var listF: Boolean = true
         var watchLaterF: Boolean = false
+        var settingsF: Boolean = false
     }
 
     @Inject
