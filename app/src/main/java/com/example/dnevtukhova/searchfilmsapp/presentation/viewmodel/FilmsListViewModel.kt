@@ -126,7 +126,7 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
             "Settings",
             Context.MODE_PRIVATE
         )
-        if (!filmsItem.favorite) {
+        if (!filmsItem.watchLater) {
             val set = mSettings.getStringSet(WATCHLATER, HashSet<String>())
             set.add(filmsItem.id.toString())
             mSettings.edit { putStringSet(WATCHLATER, set) }
