@@ -58,7 +58,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-
     companion object {
         const val TAG = "SettingsFragment"
     }

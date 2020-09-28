@@ -1,11 +1,9 @@
 package com.example.dnevtukhova.searchfilmsapp.domain
 
 import android.content.Context
-import android.util.Log
 import androidx.core.content.edit
 import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.data.FilmsRepository
-import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.FAVORITE
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.WATCHLATER
 import com.example.dnevtukhova.searchfilmsapp.data.api.PopularFilms
@@ -118,7 +116,7 @@ class FilmsInteractor @Inject constructor(
             "Settings",
             Context.MODE_PRIVATE
         )
-        val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
+        val set = mSettings.getStringSet(FAVORITE, HashSet())
 
         if (favorite) {
             set.remove(favoriteItem.id.toString())
@@ -149,10 +147,9 @@ class FilmsInteractor @Inject constructor(
             "Settings",
             Context.MODE_PRIVATE
         )
-        val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
+        val set = mSettings.getStringSet(FAVORITE, HashSet())
         var isTrue = true
         for (r in set) {
-            Log.d("FAVORITE IN SET", r)
             if (id == r) {
                 isTrue = false
             }
@@ -166,7 +163,7 @@ class FilmsInteractor @Inject constructor(
             Context.MODE_PRIVATE
         )
         var isTrue = true
-        val set = mSettings.getStringSet(WATCHLATER, HashSet<String>())
+        val set = mSettings.getStringSet(WATCHLATER, HashSet())
         for (r in set) {
             if (id == r) {
                 isTrue = false
@@ -181,7 +178,6 @@ class FilmsInteractor @Inject constructor(
             Context.MODE_PRIVATE
         )
         val value = mSettings.getLong(id, 0)
-        Log.d("VALUE_DATE_TO_WATCH", value.toString())
         return value
     }
 

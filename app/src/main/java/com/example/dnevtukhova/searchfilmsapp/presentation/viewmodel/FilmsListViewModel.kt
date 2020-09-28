@@ -2,7 +2,6 @@ package com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.LiveDataReactiveStreams
@@ -106,14 +105,11 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
         if (!filmsItem.favorite) {
             val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
             set.add(filmsItem.id.toString())
-            Log.d("set size", set.size.toString())
             mSettings.edit { putStringSet(FAVORITE, set) }
 
         } else {
             val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
-            Log.d("set size delete", set.toString())
             set.remove(filmsItem.id.toString())
-            Log.d("set size delete", set.size.toString())
             mSettings.edit {
                 putStringSet(FAVORITE, set)
             }
@@ -153,14 +149,12 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
             Context.MODE_PRIVATE
         )
         val currentDate = GregorianCalendar().timeInMillis
-        Log.d("currentDate", "$currentDate")
         val dateInPref = mSettings.getLong(CURRENT_DATE, 0)
-        Log.d("dateInPref", "$dateInPref")
         if (dateInPref == 0L || ((currentDate - dateInPref) >= 1200000L)) {
             mSettings.edit {
                 putLong(CURRENT_DATE, currentDate)
             }
-            Log.d(TAG, "обновили SharedPref")
+
             mSettings.edit {
                 putInt(PAGE_NUMBER, 1)
             }

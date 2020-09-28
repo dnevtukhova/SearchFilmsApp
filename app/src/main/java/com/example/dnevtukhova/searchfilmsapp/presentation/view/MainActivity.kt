@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -45,8 +44,6 @@ class MainActivity : AppCompatActivity(),
             setTheme(R.style.DarkTheme)
         }
         filmsItem = intent.getParcelableExtra(FILM_FROM_NOTIFICATION)
-        Log.d("TAG", filmsItem.toString())
-        Log.d(TAG, "filmsItem $filmsItem")
         openFragment(filmsItem)
         setBottomNavigation()
     }
@@ -139,7 +136,6 @@ class MainActivity : AppCompatActivity(),
         bar.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.film_favorite -> {
-                    //  supportActionBar?.show()
                     App.favoriteF = true
                     App.listF = false
                     App.watchLaterF = false
