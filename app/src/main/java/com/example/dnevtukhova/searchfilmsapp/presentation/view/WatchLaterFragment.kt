@@ -128,7 +128,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     }
 
     override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
-        calendar.set(Calendar.HOUR, p1)
+        calendar.set(Calendar.HOUR_OF_DAY, p1)
         calendar.set(Calendar.MINUTE, p2)
         setAlarm()
     }
@@ -136,7 +136,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     private fun setAlarm() {
         Log.d(FilmsListFragment.TAG, "setAlarm")
         val dateNotification = calendar.timeInMillis
-        watchLaterItem!!.dateToWatch = calendar.timeInMillis
+        watchLaterItem!!.dateToWatch = dateNotification
         watchLaterViewModel.setDateToWatch(watchLaterItem!!)
         adapterWatchLaterFilms.notifyItemChanged(myPosition!!)
         Log.d(TAG, intent.toString())
