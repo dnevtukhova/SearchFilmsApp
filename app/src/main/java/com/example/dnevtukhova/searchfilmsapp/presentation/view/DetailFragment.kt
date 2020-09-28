@@ -56,7 +56,6 @@ class DetailFragment : Fragment(), Injectable {
             requireActivity(),
             filmsViewModelFactory
         ).get(DetailFragmentViewModel::class.java)
-        Log.d(TAG, "filmsItem $filmsItem")
         if (filmsItem != null) {
             detailViewViewModel.selectFilm(filmsItem)
         }

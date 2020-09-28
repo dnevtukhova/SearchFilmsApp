@@ -19,7 +19,6 @@ import androidx.core.content.edit
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -88,14 +87,14 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         filmsViewModel.films?.observe(
             this.viewLifecycleOwner,
-            Observer<List<FilmsItem>> { films ->
+            { films ->
                 filmsViewModel.initSharedPref()
                 adapterFilms.setItems(films)
             })
 
         filmsViewModel.error.observe(
             this.viewLifecycleOwner,
-            Observer<String> { error ->
+            { error ->
                 requireView().showSnackbar("Ошибка $error", Snackbar.LENGTH_LONG, "Обновить") {
                     filmsViewModel.refreshAllFilms()
                 }
@@ -103,14 +102,13 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         filmsViewModel.searchFilms?.observe(
             this.viewLifecycleOwner,
-            Observer<MutableList<FilmsItem>> { films ->
+            { films ->
                 adapterFilmsForSearch.setItems(films)
             })
 
         filmsViewModel.progressBar.observe(
             this.viewLifecycleOwner,
-            Observer<Boolean> { it ->
-                if (progressbar != null) {
+            { if (progressbar != null) {
                     if (it) {
                         progressbar.isVisible = true
                     } else {
@@ -252,7 +250,6 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     private fun fetchData() {
         val page = filmsViewModel.mSettings.getInt(PAGE_NUMBER, 0)
-        Log.d("page", "$page")
         val page2 = page + 1
         filmsViewModel.mSettings.edit { putInt(PAGE_NUMBER, page2) }.apply {
         }
@@ -279,8 +276,6 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             calendar.get(Calendar.DAY_OF_MONTH)
         )
         datePickerDialog.show()
-        val millis: Long = calendar.timeInMillis
-        Log.d(TAG, "дата $millis")
     }
 
     override fun onDateSet(p0: DatePicker?, p1: Int, p2: Int, p3: Int) {
@@ -358,13 +353,11 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
-                Log.i("onQueryTextSubmit", query)
                 filmsViewModel.getFilmsFromSearch(query!!)
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                Log.i("onQueryTextChange", newText)
                 if (newText!!.length > 2) {
                     recycler.isVisible = false
                     recyclerViewFragmentSearch.isVisible = true

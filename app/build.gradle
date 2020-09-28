@@ -33,6 +33,7 @@ android {
     buildToolsVersion "29.0.2"
 
     defaultConfig {
+        flavorDimensions "mode"
         applicationId "com.example.dnevtukhova.searchfilmsapp"
         minSdkVersion 21
         targetSdkVersion 28
@@ -69,6 +70,18 @@ android {
         unitTests {
             includeAndroidResources = true
             returnDefaultValues = true
+        }
+    }
+
+    def MODE = "MODE"
+    productFlavors {
+        free {
+            buildConfigField "String", MODE , '\"free"'
+            applicationId "com.example.dnevtukhova.searchfilmsapp.free"
+        }
+        paid {
+            buildConfigField "String", MODE , '\"paid"'
+            applicationId "com.example.dnevtukhova.searchfilmsapp.paid"
         }
     }
 }
