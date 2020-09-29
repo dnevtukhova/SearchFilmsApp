@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.dnevtukhova.searchfilmsapp.R
@@ -62,7 +61,7 @@ class DetailFragment : Fragment(), Injectable {
         }
         detailViewViewModel.filmsDetail.observe(
             this.viewLifecycleOwner,
-            Observer<FilmsItem> { filmsDetail ->
+            { filmsDetail ->
                 val collapsingToolbarLayout =
                     view.findViewById(R.id.collapsing_toolbar) as CollapsingToolbarLayout
                 collapsingToolbarLayout.title = filmsDetail.title
@@ -103,7 +102,7 @@ class DetailFragment : Fragment(), Injectable {
             progressbarLoadImage.visibility = View.VISIBLE
             detailViewViewModel.loadImage(filmsDetailItem, requireContext())
             detailViewViewModel.loadImageLiveD.observe(this.viewLifecycleOwner,
-                Observer<DetailFragmentViewModel.State> { result ->
+                { result ->
                     when (result) {
                         is DetailFragmentViewModel.State.Success -> {
                             if (progressbarLoadImage != null) {

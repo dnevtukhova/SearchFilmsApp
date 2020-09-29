@@ -12,7 +12,7 @@ interface FilmsDao {
     @Query("SELECT * FROM films_table WHERE id = :id")
     fun getFilm(id:Int): FilmsItem
 
-    @Insert (onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(films: List<FilmsItem>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -36,6 +36,6 @@ interface FilmsDao {
     @Query("SELECT DISTINCT * FROM films_table WHERE watchLater = 0")
     fun getAllWatchLater(): Flowable<List<FilmsItem>>
 
-    @Query ("UPDATE films_table SET dateToWatch = :dateToWatch where id = :id")
+    @Query("UPDATE films_table SET dateToWatch = :dateToWatch where id = :id")
     fun updateTimeToWatch(id: Int, dateToWatch: Long)
 }

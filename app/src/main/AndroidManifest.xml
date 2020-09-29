@@ -21,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".presentation.view.Receiver" />
+        <receiver android:name=".presentation.view.Receiver"
+            android:enabled="true"/>
     </application>
 </manifest>

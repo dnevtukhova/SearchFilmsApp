@@ -105,15 +105,15 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
         )
         if (!filmsItem.favorite) {
             val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
-            set.add(filmsItem.id.toString())
-            Log.d("set size", set.size.toString())
+            set?.add(filmsItem.id.toString())
+            Log.d("set size", set?.size.toString())
             mSettings.edit { putStringSet(FAVORITE, set) }
 
         } else {
             val set = mSettings.getStringSet(FAVORITE, HashSet<String>())
             Log.d("set size delete", set.toString())
-            set.remove(filmsItem.id.toString())
-            Log.d("set size delete", set.size.toString())
+            set?.remove(filmsItem.id.toString())
+            Log.d("set size delete", set!!.size.toString())
             mSettings.edit {
                 putStringSet(FAVORITE, set)
             }
@@ -128,12 +128,12 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
         )
         if (!filmsItem.watchLater) {
             val set = mSettings.getStringSet(WATCHLATER, HashSet<String>())
-            set.add(filmsItem.id.toString())
+            set?.add(filmsItem.id.toString())
             mSettings.edit { putStringSet(WATCHLATER, set) }
             mSettings.edit { putLong(filmsItem.id.toString(), filmsItem.dateToWatch!!) }
         } else {
             val set = mSettings.getStringSet(WATCHLATER, HashSet<String>())
-            set.remove(filmsItem.id.toString())
+            set?.remove(filmsItem.id.toString())
             mSettings.edit { putStringSet(WATCHLATER, set) }
         }
 

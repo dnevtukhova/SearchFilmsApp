@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class SingleLiveEvent<String> : MutableLiveData<String>() {
     private val pending = AtomicBoolean(false)
+
     @MainThread
     override fun observe(owner: LifecycleOwner, observer: Observer<in String>) {
         if (hasActiveObservers()) {

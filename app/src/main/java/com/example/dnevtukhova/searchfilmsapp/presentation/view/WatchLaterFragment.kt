@@ -23,7 +23,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
@@ -71,7 +70,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         ).get(WatchLaterFragmentViewModel::class.java)
         watchLaterViewModel.watchLaterFilms?.observe(
             this.viewLifecycleOwner,
-            Observer<List<FilmsItem>> { films -> adapterWatchLaterFilms.setItems(films) })
+            { films -> adapterWatchLaterFilms.setItems(films) })
     }
 
     private fun initRecycler(view: View) {

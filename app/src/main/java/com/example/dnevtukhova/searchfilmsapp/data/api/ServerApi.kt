@@ -12,7 +12,7 @@ interface ServerApi {
         @Query("page") page: Int
     ): Single <PopularFilms>
 
-    @GET("search/movie")
+    @GET ("search/movie")
     fun searchFilms(
         @Query("api_key") key: String,
         @Query("language") language: String,
