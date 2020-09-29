@@ -8,11 +8,11 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-@Entity (tableName = "films_table",
-        indices = [
-            Index(value = ["id"])]
-    )
-    data class FilmsItem (
+@Entity(
+    tableName = "films_table",
+    indices = [Index(value = ["id"])]
+)
+data class FilmsItem(
     var id: Int,
     var title: String,
     var description: String,
@@ -20,7 +20,8 @@ import kotlinx.android.parcel.Parcelize
     var favorite: Boolean,
     var watchLater: Boolean,
     var dateToWatch: Long?,
-    var average: Float): Parcelable {
+    var average: Float
+) : Parcelable {
     @IgnoredOnParcel
     @PrimaryKey(autoGenerate = true)
     var idFilms = 0

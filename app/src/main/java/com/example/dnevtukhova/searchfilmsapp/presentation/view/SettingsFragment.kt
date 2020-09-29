@@ -43,6 +43,7 @@ class SettingsFragment : Fragment() {
                 Toast.makeText(context, "Темная тема установлена", Toast.LENGTH_SHORT).show()
             }
         }
+
         lightButton.setOnClickListener {
             if (!theme) {
                 mSettings.edit { putBoolean(NetworkConstants.THEME, true) }.apply {
@@ -52,12 +53,12 @@ class SettingsFragment : Fragment() {
                 Toast.makeText(context, "Светлая тема установлена", Toast.LENGTH_SHORT).show()
             }
         }
+
         logoMovie.setOnClickListener {
             val browseIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themoviedb.org"))
             startActivity(browseIntent)
         }
     }
-
 
     companion object {
         const val TAG = "SettingsFragment"

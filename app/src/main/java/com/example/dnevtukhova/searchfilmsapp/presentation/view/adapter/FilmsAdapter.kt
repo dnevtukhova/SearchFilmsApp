@@ -21,7 +21,8 @@ import java.util.*
 class FilmsAdapter(
     private val context: Context,
     private val inflater: LayoutInflater,
-    private val listener: OnFilmsClickListener): RecyclerView.Adapter<FilmsItemViewHolder>() {
+    private val listener: OnFilmsClickListener
+) : RecyclerView.Adapter<FilmsItemViewHolder>() {
     private val items = ArrayList<FilmsItem>()
 
     fun setItems(films: List<FilmsItem>) {

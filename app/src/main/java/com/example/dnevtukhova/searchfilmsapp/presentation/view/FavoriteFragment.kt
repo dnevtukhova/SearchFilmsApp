@@ -12,7 +12,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
@@ -56,7 +55,7 @@ class FavoriteFragment : Fragment(), Injectable {
         initRecycler(view)
         favoriteViewModel.favoriteFilms?.observe(
             this.viewLifecycleOwner,
-            Observer<List<FilmsItem>> { films ->
+            { films ->
                 adapterFavoriteFilms.setItems(films)
             })
 
@@ -133,8 +132,7 @@ class FavoriteFragment : Fragment(), Injectable {
         private val context: Context,
         private val inflater: LayoutInflater,
         private val listener: OnFavoriteFilmsClickListener
-    ) :
-        RecyclerView.Adapter<FilmsFavouriteItemViewHolder>() {
+    ) : RecyclerView.Adapter<FilmsFavouriteItemViewHolder>() {
         private val items = ArrayList<FilmsItem>()
 
         fun setItems(films: List<FilmsItem>) {

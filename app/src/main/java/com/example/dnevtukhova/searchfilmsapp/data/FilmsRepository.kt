@@ -6,8 +6,7 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 
-class FilmsRepository(filmsDao: FilmsDao) {
-    private var filmsDao = filmsDao
+class FilmsRepository(private val filmsDao: FilmsDao) {
     private var filmsData: Flowable<List<FilmsItem>>? = filmsDao.getFilms()
     private var favoriteData: Flowable<List<FilmsItem>>? = filmsDao.getAllFavorite()
     private var watchLaterData: Flowable<List<FilmsItem>>? = filmsDao.getAllWatchLater()
@@ -65,7 +64,7 @@ class FilmsRepository(filmsDao: FilmsDao) {
 
     fun removeAllFilms() {
         Completable.fromRunnable {
-            filmsDao?.removeAllFilms()
+            filmsDao.removeAllFilms()
         }
             .subscribeOn(Schedulers.computation())
             .subscribe()

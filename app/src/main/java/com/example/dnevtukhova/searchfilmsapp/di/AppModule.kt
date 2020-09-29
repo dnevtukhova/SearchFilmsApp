@@ -70,5 +70,4 @@ class AppModule {
     fun providesFilmsDAO(filmsDb: FilmsDb): FilmsDao {
         return filmsDb.getFilmsDao()
     }
-
 }

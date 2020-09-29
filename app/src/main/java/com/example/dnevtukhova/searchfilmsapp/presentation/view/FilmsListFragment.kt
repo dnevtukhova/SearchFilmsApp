@@ -14,12 +14,10 @@ import android.widget.SearchView
 import android.widget.TimePicker
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.edit
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -88,14 +86,14 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         filmsViewModel.films?.observe(
             this.viewLifecycleOwner,
-            Observer<List<FilmsItem>> { films ->
+            { films ->
                 filmsViewModel.initSharedPref()
                 adapterFilms.setItems(films)
             })
 
         filmsViewModel.error.observe(
             this.viewLifecycleOwner,
-            Observer<String> { error ->
+            { error ->
                 requireView().showSnackbar("Ошибка $error", Snackbar.LENGTH_LONG, "Обновить") {
                     filmsViewModel.refreshAllFilms()
                 }
@@ -103,13 +101,13 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         filmsViewModel.searchFilms?.observe(
             this.viewLifecycleOwner,
-            Observer<MutableList<FilmsItem>> { films ->
+            { films ->
                 adapterFilmsForSearch.setItems(films)
             })
 
         filmsViewModel.progressBar.observe(
             this.viewLifecycleOwner,
-            Observer<Boolean> { it ->
+            {
                 if (progressbar != null) {
                     if (it) {
                         progressbar.isVisible = true
@@ -128,7 +126,7 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             filmsViewModel.refreshAllFilms()
             swipeRefreshLayout.isRefreshing = false
         }
-        am = getSystemService(requireContext(), AlarmManager::class.java)
+        am = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         detailViewModel = ViewModelProvider(
             requireActivity(),
             filmsViewModelFactory
@@ -163,6 +161,7 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         detailViewModel.selectFilm(filmsItem)
                         listener?.onFilmsSelected(filmsItem)
                     }
+
                     override fun onFavouriteClick(filmsItem: FilmsItem, position: Int) {
                         Log.d(
                             TAG,
@@ -240,8 +239,10 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                     detailViewModel.selectFilm(filmsItem)
                     listener?.onFilmsSelected(filmsItem)
                 }
+
                 override fun onFavouriteClick(filmsItem: FilmsItem, position: Int) {
                 }
+
                 @RequiresApi(Build.VERSION_CODES.M)
                 override fun onWatchLaterClick(filmsItem: FilmsItem, position: Int) {
                 }
@@ -260,7 +261,8 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         recycler.post {
             adapterFilms.notifyItemRangeChanged(
                 layoutManager.itemCount,
-                20)
+                20
+            )
         }
     }
 
@@ -308,18 +310,27 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         filmsViewModel.changeWatchLater(myFilmsItem!!)
         adapterFilms.notifyItemChanged(myPosition!!)
         adapterFilmsForSearch.notifyDataSetChanged()
+        intent?.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
         pIntentOnce =
             PendingIntent.getBroadcast(
-                requireContext(),
+                context,
                 0,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
-        am?.setExact(
-            AlarmManager.RTC_WAKEUP,
-            dateNotification!!,
-            pIntentOnce
-        )
+        if (Build.VERSION.SDK_INT >= 23) {
+            am?.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                dateNotification!!,
+                pIntentOnce
+            )
+        } else {
+            am?.setExact(
+                AlarmManager.RTC_WAKEUP,
+                dateNotification!!,
+                pIntentOnce
+            )
+        }
     }
 
     fun createIntent(filmsItem: FilmsItem): Intent {
@@ -357,15 +368,15 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
-            override fun onQueryTextSubmit(query: String?): Boolean {
+            override fun onQueryTextSubmit(query: String): Boolean {
                 Log.i("onQueryTextSubmit", query)
-                filmsViewModel.getFilmsFromSearch(query!!)
+                filmsViewModel.getFilmsFromSearch(query)
                 return false
             }
 
-            override fun onQueryTextChange(newText: String?): Boolean {
+            override fun onQueryTextChange(newText: String): Boolean {
                 Log.i("onQueryTextChange", newText)
-                if (newText!!.length > 2) {
+                if (newText.length > 2) {
                     recycler.isVisible = false
                     recyclerViewFragmentSearch.isVisible = true
                 }
@@ -383,7 +394,6 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
             recycler.isVisible = true
             true
         }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -398,7 +408,6 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                     )
                     .addToBackStack(SettingsFragment.TAG)
                     .commit()
-
                 return false
             }
         }
