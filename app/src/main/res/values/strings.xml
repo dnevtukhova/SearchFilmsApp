@@ -28,8 +28,17 @@
     <string name="permissionNoGranted">Разрешение НЕ предоставлено</string>
     <string name="fileSaveInGallery">Файл сохранен в галерее</string>
     <string name="settings">Настройки</string>
-    <string name="license">Этот продукт использует TMDb API, но не сертифицирован TMDB.</string>
+    <string name="license">Этот продукт использует TMDB API, но не сертифицирован TMDB.</string>
     <string name="changeTheme">Изменить тему:</string>
     <string name="lightText"> СВЕТЛАЯ</string>
     <string name="darkText"> ТЕМНАЯ</string>
+    <string name="remindToSearchFilm">Напомнить посмотреть фильм: </string>
+    <string name="darkTheme">Темная тема установлена</string>
+    <string name="lightTheme">Светлая тема установлена</string>
+    <string name="update">Обновить</string>
+    <string name="errorText">Ошибка</string>
+    <string name="cancelText">Отменить</string>
+    <string name="deleteFilm">Удален фильм</string>
+    <string name="ratingText">Рейтинг</string>
+    <string name="dateInFutureError">Необхдимо выбрать дату и время в будущем</string>
 </resources>

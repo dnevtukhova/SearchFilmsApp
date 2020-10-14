@@ -26,8 +26,17 @@
     <string name="downloadPoster">Downloap poster</string>
     <string name="rating">Rating</string>
     <string name="settings">Settings</string>
-    <string name="license">This product uses the TMDb API but is not endrosed or certified by TMDB</string>
+    <string name="license">This product uses the TMDB API but is not endrosed or certified by TMDB</string>
     <string name="changeTheme">Change theme</string>
     <string name="lightText">LIGHT</string>
     <string name="darkText">DARK</string>
+    <string name="remindToSearchFilm">Remind me to watch a movie</string>
+    <string name="darkTheme">Dark theme set</string>
+    <string name="lightTheme">Light theme set</string>
+    <string name="update">Update</string>
+    <string name="errorText">Error</string>
+    <string name="cancelText">Cancel</string>
+    <string name="deleteFilm">Delete film</string>
+    <string name="ratingText">Rating</string>
+    <string name="dateInFutureError">You need to select date and time in future</string>
 </resources>

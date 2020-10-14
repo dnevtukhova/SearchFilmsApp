@@ -11,6 +11,7 @@ import com.example.dnevtukhova.searchfilmsapp.data.api.PopularFilms
 import com.example.dnevtukhova.searchfilmsapp.data.api.ServerApi
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import io.reactivex.Flowable
+import io.reactivex.Single
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -23,8 +24,8 @@ class FilmsInteractor @Inject constructor(
     val serverApi: ServerApi,
     val filmsRepository: FilmsRepository
 ) {
-    fun getFilms(key: String, language: String, page: Int, callback: GetFilmsCallback) {
-        serverApi.getFilms(key, language, page)
+    fun getFilms(key: String, language: String, page: Int, callback: GetFilmsCallback): Single<PopularFilms> {
+       serverApi.getFilms(key, language, page)
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.newThread())
             .subscribe(object : DisposableSingleObserver<PopularFilms>() {
@@ -47,12 +48,14 @@ class FilmsInteractor @Inject constructor(
                         }
                     filmsRepository.addToCache(filmsList)
                     callback.onSuccess(filmsRepository.films)
+
                 }
 
                 override fun onError(e: Throwable) {
                     callback.onError("!!! произошла ошибка $e")
                 }
             })
+        return  serverApi.getFilms(key, language, page)
     }
 
     fun getSearchFilms(
@@ -61,7 +64,7 @@ class FilmsInteractor @Inject constructor(
         page: Int,
         query: String,
         callback: GetFilmsCallback
-    ) {
+    ): Single<PopularFilms> {
         val disposable = serverApi.searchFilms(key, language, page, query)
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.newThread())
@@ -88,6 +91,7 @@ class FilmsInteractor @Inject constructor(
                     callback.onSuccess(filmsList)
                 }
             )
+        return serverApi.searchFilms(key, language, page, query)
     }
 
     fun getFilms(): Flowable<List<FilmsItem>>? {
@@ -112,7 +116,7 @@ class FilmsInteractor @Inject constructor(
     fun changeFavorite(favoriteItem: FilmsItem, favorite: Boolean) {
         filmsRepository.setFavorite(favoriteItem, favorite)
         val mSettings = App.instance.applicationContext.getSharedPreferences(
-            "Settings",
+            SETTINGS,
             Context.MODE_PRIVATE
         )
         val set = mSettings.getStringSet(FAVORITE, HashSet())
@@ -143,7 +147,7 @@ class FilmsInteractor @Inject constructor(
 
     fun isFavorite(id: String): Boolean {
         val mSettings = App.instance.applicationContext.getSharedPreferences(
-            "Settings",
+            SETTINGS,
             Context.MODE_PRIVATE
         )
         val set = mSettings.getStringSet(FAVORITE, HashSet())
@@ -159,7 +163,7 @@ class FilmsInteractor @Inject constructor(
 
     fun isWatchLater(id: String): Boolean {
         val mSettings = App.instance.applicationContext.getSharedPreferences(
-            "Settings",
+            SETTINGS,
             Context.MODE_PRIVATE
         )
         var isTrue = true
@@ -174,7 +178,7 @@ class FilmsInteractor @Inject constructor(
 
     fun getDateToWatchValue(id: String): Long {
         val mSettings = App.instance.applicationContext.getSharedPreferences(
-            "Settings",
+            SETTINGS,
             Context.MODE_PRIVATE
         )
         val value = mSettings.getLong(id, 0)
@@ -184,5 +188,9 @@ class FilmsInteractor @Inject constructor(
 
     fun addFilm(filmsItem: FilmsItem) {
         filmsRepository.addFilm(filmsItem)
+    }
+
+    companion object {
+        const val SETTINGS = "Settings"
     }
 }

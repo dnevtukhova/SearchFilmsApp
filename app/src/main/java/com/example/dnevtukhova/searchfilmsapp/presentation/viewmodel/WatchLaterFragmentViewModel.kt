@@ -44,4 +44,23 @@ class WatchLaterFragmentViewModel @Inject constructor(val filmsInteractor: Films
             mSettings.edit { putStringSet(NetworkConstants.WATCHLATER, set) }
         }
     }
+
+    fun changeWatchLater(filmsItem: FilmsItem) {
+        filmsInteractor.changeWatchLater(filmsItem)
+        mSettings = App.instance.applicationContext.getSharedPreferences(
+            FilmsListViewModel.SETTINGS,
+            Context.MODE_PRIVATE
+        )
+        if (!filmsItem.watchLater) {
+            val set = mSettings.getStringSet(NetworkConstants.WATCHLATER, HashSet<String>())
+            set?.add(filmsItem.id.toString())
+            mSettings.edit { putStringSet(NetworkConstants.WATCHLATER, set) }
+            mSettings.edit { putLong(filmsItem.id.toString(), filmsItem.dateToWatch!!) }
+        } else {
+            val set = mSettings.getStringSet(NetworkConstants.WATCHLATER, HashSet<String>())
+            set?.remove(filmsItem.id.toString())
+            mSettings.edit { putStringSet(NetworkConstants.WATCHLATER, set) }
+        }
+
+    }
 }

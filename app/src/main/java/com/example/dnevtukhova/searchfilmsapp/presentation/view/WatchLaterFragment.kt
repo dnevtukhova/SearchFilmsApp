@@ -5,7 +5,6 @@ import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -14,13 +13,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import android.widget.DatePicker
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.TimePicker
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -33,6 +28,7 @@ import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PICTURE
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.example.dnevtukhova.searchfilmsapp.di.Injectable
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.WatchLaterFragmentViewModel
+import kotlinx.android.synthetic.main.item_film_watch_later.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -49,6 +45,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     private var myPosition: Int? = null
     private var intent: Intent? = null
 
+
     companion object {
         const val TAG = "WatchLaterFragment"
     }
@@ -63,7 +60,9 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         initRecycler(view)
+
         watchLaterViewModel = ViewModelProvider(
             requireActivity(),
             filmsViewModelFactory
@@ -77,7 +76,6 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         val recycler = view.findViewById<RecyclerView>(R.id.recyclerViewWatchLater)
         adapterWatchLaterFilms =
             FilmsWatchLaterAdapter(
-                requireContext(),
                 LayoutInflater.from(context),
                 object :
                     FilmsWatchLaterAdapter.OnWatchLaterFilmsClickListener {
@@ -87,6 +85,26 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         myPosition = position
                         intent = createIntent(filmsItem)
                         selectDateAndTime()
+                    }
+
+                    override fun onCancelClick(filmsItem: FilmsItem, position: Int) {
+                        filmsItem.watchLater = true
+                        watchLaterViewModel.changeWatchLater(filmsItem)
+                        //   if (pIntentOnce != null) {
+                        intent = createIntent(filmsItem)
+                        val pIntentOnce = PendingIntent.getBroadcast(
+                            requireContext(),
+                            0,
+                            intent,
+                            PendingIntent.FLAG_CANCEL_CURRENT
+                        )
+                        val am = ContextCompat.getSystemService(
+                            requireContext(),
+                            AlarmManager::class.java
+                        )
+                        am?.cancel (pIntentOnce)
+
+                        adapterWatchLaterFilms.notifyItemChanged(position)
                     }
                 }
             )
@@ -133,30 +151,38 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     }
 
     private fun setAlarm() {
-        Log.d(FilmsListFragment.TAG, "setAlarm")
+        Log.d(TAG, "setAlarm")
         val dateNotification = calendar.timeInMillis
-        watchLaterItem!!.dateToWatch = dateNotification
-        watchLaterViewModel.setDateToWatch(watchLaterItem!!)
-        adapterWatchLaterFilms.notifyItemChanged(myPosition!!)
-        Log.d(TAG, intent.toString())
-        val pIntentOnce =
-            PendingIntent.getBroadcast(
+        if (dateNotification < GregorianCalendar().timeInMillis) {
+            Toast.makeText(
                 requireContext(),
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                requireContext().getString(R.string.dateInFutureError),
+                Toast.LENGTH_LONG
+            ).show()
+        } else {
+            watchLaterItem!!.dateToWatch = dateNotification
+            watchLaterViewModel.setDateToWatch(watchLaterItem!!)
+            adapterWatchLaterFilms.notifyItemChanged(myPosition!!)
+            Log.d(TAG, intent.toString())
+            val pIntentOnce =
+                PendingIntent.getBroadcast(
+                    requireContext(),
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            val am =
+                ContextCompat.getSystemService(requireContext(), AlarmManager::class.java)
+            am?.setExact(
+                AlarmManager.RTC_WAKEUP,
+                dateNotification,
+                pIntentOnce
             )
-        val am: AlarmManager? =
-            ContextCompat.getSystemService(requireContext(), AlarmManager::class.java)
-        am?.setExact(
-            AlarmManager.RTC_WAKEUP,
-            dateNotification,
-            pIntentOnce
-        )
+        }
     }
 
     fun createIntent(filmsItem: FilmsItem): Intent {
-        val intent = Intent("${filmsItem.id}", null, context, Receiver::class.java)
+        val intent = Intent("${filmsItem.id}", null, context, NotificationReceiver::class.java)
         val bundle = Bundle()
         bundle.putParcelable(FilmsListFragment.FILMS_ITEM_EXTRA, filmsItem)
         intent.putExtra(FilmsListFragment.BUNDLE, bundle)
@@ -165,18 +191,21 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     //region adapter and holder
     class FilmsWatchLaterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val titleTv: TextView = itemView.findViewById(R.id.titleTv)
-        private val date: TextView = itemView.findViewById(R.id.descriptionFilm)
-        private val imageFilm: ImageView = itemView.findViewById(R.id.image)
-        var container: ConstraintLayout = itemView.findViewById(R.id.container)
+        private val titleTv: TextView = itemView.findViewById(R.id.titleTvWatchLater)
+        private val date: TextView = itemView.findViewById(R.id.dateWatchLater)
+        private val imageFilm: ImageView = itemView.findViewById(R.id.imageWatchLater)
+        private val imageClock: ImageView = itemView.findViewById(R.id.dateToWatchImage)
+        private val cancelText: TextView = itemView.findViewById(R.id.cancelNotification)
 
         @SuppressLint("SimpleDateFormat", "SetTextI18n")
         fun bind(item: FilmsItem) {
             titleTv.text = item.title
             val locale = Locale("RU")
-            val simpleDateFormat = SimpleDateFormat("EEEE dd MMMM yyyy HH:mm", locale)
+            val simpleDateFormat = SimpleDateFormat("dd MMMM yyyy HH:mm", locale)
             val dateToWatch = simpleDateFormat.format(Date(item.dateToWatch!!)).toString()
-            date.text = "Напомнить посмотреть фильм: $dateToWatch"
+            date.text = dateToWatch
+            cancelText.text = itemView.context.getString(R.string.cancelText)
+            imageClock.setImageResource(R.drawable.ic_baseline_alarm_30)
             Glide.with(imageFilm.context)
                 .load(PICTURE + item.image)
                 .placeholder(R.drawable.ic_photo_black_24dp)
@@ -184,13 +213,19 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                 .centerCrop()
                 .transform(RoundedCorners(30))
                 .into(imageFilm)
+            itemView.containerWatchLater.animation =
+                AnimationUtils.loadAnimation(
+                    itemView.context,
+                    R.anim.my_animation
+                )
         }
+
     }
 
     class FilmsWatchLaterAdapter(
-        private val context: Context,
         private val inflater: LayoutInflater,
         private val listener: OnWatchLaterFilmsClickListener
+
     ) :
         RecyclerView.Adapter<FilmsWatchLaterViewHolder>() {
         private val items = ArrayList<FilmsItem>()
@@ -207,7 +242,7 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         ): FilmsWatchLaterViewHolder {
             return FilmsWatchLaterViewHolder(
                 inflater.inflate(
-                    R.layout.item_film,
+                    R.layout.item_film_watch_later,
                     parent,
                     false
                 )
@@ -217,18 +252,17 @@ class WatchLaterFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         override fun getItemCount() = items.size
 
         override fun onBindViewHolder(holder: FilmsWatchLaterViewHolder, position: Int) {
-            holder.container.animation =
-                AnimationUtils.loadAnimation(
-                    context,
-                    R.anim.my_animation
-                )
+
             val item = items[position]
             holder.bind(item)
             holder.itemView.setOnClickListener { listener.onWatchLaterFilmsFClick(item, position) }
+            val cancelText: TextView = holder.itemView.findViewById(R.id.cancelNotification)
+            cancelText.setOnClickListener { listener.onCancelClick(item, position) }
         }
 
         interface OnWatchLaterFilmsClickListener {
             fun onWatchLaterFilmsFClick(filmsItem: FilmsItem, position: Int)
+            fun onCancelClick(filmsItem: FilmsItem, position: Int)
         }
     }
     //endregion

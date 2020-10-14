@@ -11,17 +11,17 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 
-class Receiver : BroadcastReceiver() {
+class NotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, p1: Intent?) {
         val bundle = p1?.getBundleExtra(FilmsListFragment.BUNDLE)
         val filmsItem: FilmsItem? = bundle?.getParcelable(FilmsListFragment.FILMS_ITEM_EXTRA)
         val notificationIntent = Intent("$filmsItem.id", null, context, MainActivity::class.java)
-        notificationIntent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
+        notificationIntent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
         notificationIntent.putExtra(MainActivity.FILM_FROM_NOTIFICATION, filmsItem)
 
         val pendingIntent = PendingIntent.getActivity(
             context,
-            1,
+            0,
             notificationIntent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
@@ -42,7 +42,7 @@ class Receiver : BroadcastReceiver() {
         val builder = NotificationCompat.Builder(context, FilmsListFragment.CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notifications_active_white_24dp)
             .setContentTitle(filmsItem!!.title)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setStyle(NotificationCompat.BigTextStyle().bigText(filmsItem.description))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)

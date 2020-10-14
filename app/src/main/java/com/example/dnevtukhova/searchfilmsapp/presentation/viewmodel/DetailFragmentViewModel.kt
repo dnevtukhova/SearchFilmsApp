@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.example.dnevtukhova.searchfilmsapp.domain.FilmsInteractor
@@ -49,7 +50,8 @@ class DetailFragmentViewModel @Inject constructor(filmsInteractor: FilmsInteract
                 }
 
                 override fun onError(e: Throwable) {
-                    loadImageLiveData.postValue(State.Error("Ошибка $e"))
+                    loadImageLiveData.postValue(State.Error("${
+                        R.string.errorText} $e"))
                 }
             })
     }

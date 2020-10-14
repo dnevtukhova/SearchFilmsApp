@@ -18,6 +18,7 @@ import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.WATCHLAT
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
 import com.example.dnevtukhova.searchfilmsapp.domain.FilmsInteractor
 import io.reactivex.Flowable
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import testing.OpenForTesting
 import java.util.*
@@ -52,7 +53,7 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
 
     fun refreshAllFilms() {
         progressBarLiveData.postValue(true)
-        filmsInteractor.getFilms(
+       filmsInteractor.getFilms(
             API_KEY,
             LANGUAGE,
             mSettings.getInt(PAGE_NUMBER, 0),
@@ -100,7 +101,7 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
     fun selectFavorite(filmsItem: FilmsItem) {
         filmsInteractor.selectFavorite(filmsItem)
         mSettings = App.instance.applicationContext.getSharedPreferences(
-            "Settings",
+            SETTINGS,
             Context.MODE_PRIVATE
         )
         if (!filmsItem.favorite) {
@@ -123,7 +124,7 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
     fun changeWatchLater(filmsItem: FilmsItem) {
         filmsInteractor.changeWatchLater(filmsItem)
         mSettings = App.instance.applicationContext.getSharedPreferences(
-            "Settings",
+            SETTINGS,
             Context.MODE_PRIVATE
         )
         if (!filmsItem.watchLater) {
@@ -149,7 +150,7 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
 
     fun initSharedPref() {
         mSettings = App.instance.applicationContext.getSharedPreferences(
-            "Settings",
+            SETTINGS,
             Context.MODE_PRIVATE
         )
         val currentDate = GregorianCalendar().timeInMillis
@@ -171,5 +172,6 @@ class FilmsListViewModel @Inject constructor(val filmsInteractor: FilmsInteracto
 
     companion object {
         const val TAG = "FilmListViewModel"
+        const val SETTINGS = "Settings"
     }
 }

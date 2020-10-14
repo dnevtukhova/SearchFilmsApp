@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -47,43 +46,39 @@ class DetailFragment : Fragment(), Injectable {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         progressbarLoadImage.visibility = View.INVISIBLE
+
         val bundle = arguments
-        val filmsItem: FilmsItem? = bundle?.getParcelable("key")
+
+        val filmsItem: FilmsItem? = bundle?.getParcelable(KEY)
 
         detailViewViewModel = ViewModelProvider(
             requireActivity(),
             filmsViewModelFactory
         ).get(DetailFragmentViewModel::class.java)
         Log.d(TAG, "filmsItem $filmsItem")
+
         if (filmsItem != null) {
             detailViewViewModel.selectFilm(filmsItem)
         }
         detailViewViewModel.filmsDetail.observe(
             this.viewLifecycleOwner,
             { filmsDetail ->
-                val collapsingToolbarLayout =
-                    view.findViewById(R.id.collapsing_toolbar) as CollapsingToolbarLayout
-                collapsingToolbarLayout.title = filmsDetail.title
-                collapsingToolbarLayout.setExpandedTitleColor(
-                    getColor(
-                        requireContext(),
-                        android.R.color.transparent
-                    )
-                )
+
                 initializeObjects(filmsDetail)
+
                 filmsDetailItem = filmsDetail
+
                 button_load_file.setOnClickListener { loadPoster() }
+
                 if (!filmsDetail.favorite) {
                     imageFavoriteDetail.setImageResource(R.drawable.ic_favorite_red_48dp)
                 }
-                ratingText.text = "Рейтинг ${filmsDetail.average}"
+                ratingText.text = "${requireContext().getString(R.string.ratingText)} ${filmsDetail.average}"
             })
+
         imageShared.setOnClickListener {
-            imageShared.animation = AnimationUtils.loadAnimation(
-                context,
-                R.anim.my_animation
-            )
             val i = Intent(Intent.ACTION_SEND)
             i.type = "text/plain"
             val text =
@@ -108,7 +103,7 @@ class DetailFragment : Fragment(), Injectable {
                             if (progressbarLoadImage != null) {
                                 progressbarLoadImage.visibility = View.GONE
                             }
-                            galleryAddPic(result.imagePath)
+                            galleryAddPic(result.imagePath!!)
                             requireView().showSnackbar(
                                 R.string.fileSaveInGallery,
                                 Snackbar.LENGTH_INDEFINITE
@@ -168,15 +163,23 @@ class DetailFragment : Fragment(), Injectable {
         }
     }
 
-    private fun galleryAddPic(imagePath: String?) {
+    private fun galleryAddPic(imagePath: String) {
         val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
         val contentUri: Uri = Uri.fromFile(File(imagePath))
         mediaScanIntent.data = contentUri
         requireActivity().sendBroadcast(mediaScanIntent)
     }
 
-    @SuppressLint("ResourceType")
-    fun initializeObjects(item: FilmsItem) {
+    private fun initializeObjects(item: FilmsItem) {
+        val collapsingToolbarLayout =
+            requireView().findViewById(R.id.collapsing_toolbar) as CollapsingToolbarLayout
+        collapsingToolbarLayout.title = item.title
+        collapsingToolbarLayout.setExpandedTitleColor(
+            getColor(
+                requireContext(),
+                android.R.color.transparent
+            )
+        )
         Glide.with(image_detail_view.context)
             .load(PICTURE + item.image)
             .into(image_detail_view)
@@ -185,6 +188,7 @@ class DetailFragment : Fragment(), Injectable {
 
     companion object {
         const val TAG = "DetailFragment"
+        const val KEY = "key"
         fun newInstance(): DetailFragment {
             return DetailFragment()
         }
@@ -192,7 +196,7 @@ class DetailFragment : Fragment(), Injectable {
         fun newInstance(filmsItem: FilmsItem): DetailFragment {
             val detailFragment = DetailFragment()
             val bundle = Bundle()
-            bundle.putParcelable("key", filmsItem)
+            bundle.putParcelable(KEY, filmsItem)
             detailFragment.arguments = bundle
             return detailFragment
         }

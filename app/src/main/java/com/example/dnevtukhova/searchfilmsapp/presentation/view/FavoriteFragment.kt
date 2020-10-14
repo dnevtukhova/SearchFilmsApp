@@ -1,6 +1,5 @@
 package com.example.dnevtukhova.searchfilmsapp.presentation.view
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
@@ -24,6 +22,7 @@ import com.example.dnevtukhova.searchfilmsapp.di.Injectable
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.DetailFragmentViewModel
 import com.example.dnevtukhova.searchfilmsapp.presentation.viewmodel.FavoriteFragmentViewModel
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.item_film.view.*
 import java.util.*
 import javax.inject.Inject
 
@@ -69,7 +68,6 @@ class FavoriteFragment : Fragment(), Injectable {
         val recycler = view.findViewById<RecyclerView>(R.id.recyclerViewFavorite)
         adapterFavoriteFilms =
             FilmsFavoriteAdapter(
-                requireContext(),
                 LayoutInflater.from(context),
                 //по долгому клику удаление элемента
                 object :
@@ -80,14 +78,14 @@ class FavoriteFragment : Fragment(), Injectable {
                     ): Boolean {
                         favoriteViewModel.changeFavorite(filmsItem, true)
                         requireView().showSnackbar(
-                            "Удален фильм '${filmsItem.title}'",
+                            "${requireContext().getString(R.string.deleteFilm)} ${filmsItem.title}",
                             Snackbar.LENGTH_LONG,
-                            "Отменить"
+                            requireContext().getString(R.string.cancelText)
                         ) {
                             favoriteViewModel.changeFavorite(filmsItem, false)
-                            adapterFavoriteFilms.notifyDataSetChanged()
+                            adapterFavoriteFilms.notifyItemChanged(position)
                         }
-                        adapterFavoriteFilms.notifyDataSetChanged()
+                        adapterFavoriteFilms.notifyItemChanged(position)
                         return true
                     }
 
@@ -113,7 +111,6 @@ class FavoriteFragment : Fragment(), Injectable {
         private val titleTv: TextView = itemView.findViewById(R.id.titleTv)
         private val subtitleTv: TextView = itemView.findViewById(R.id.descriptionFilm)
         private val imageFilm: ImageView = itemView.findViewById(R.id.image)
-        var container: ConstraintLayout = itemView.findViewById(R.id.container)
 
         fun bind(item: FilmsItem) {
             titleTv.text = item.title
@@ -125,11 +122,15 @@ class FavoriteFragment : Fragment(), Injectable {
                 .centerCrop()
                 .transform(RoundedCorners(30))
                 .into(imageFilm)
+            itemView.container.animation =
+                AnimationUtils.loadAnimation(
+                    itemView.context,
+                    R.anim.my_animation
+                )
         }
     }
 
     class FilmsFavoriteAdapter(
-        private val context: Context,
         private val inflater: LayoutInflater,
         private val listener: OnFavoriteFilmsClickListener
     ) : RecyclerView.Adapter<FilmsFavouriteItemViewHolder>() {
@@ -157,12 +158,6 @@ class FavoriteFragment : Fragment(), Injectable {
         override fun getItemCount() = items.size
 
         override fun onBindViewHolder(holder: FilmsFavouriteItemViewHolder, position: Int) {
-            holder.container.animation =
-                AnimationUtils.loadAnimation(
-                    context,
-                    R.anim.my_animation
-                )
-
             val item = items[position]
             holder.bind(item)
             holder.itemView.setOnLongClickListener {

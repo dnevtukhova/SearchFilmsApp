@@ -29,7 +29,7 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val mSettings = App.instance.applicationContext.getSharedPreferences(
-            "Settings",
+            SETTINGS,
             Context.MODE_PRIVATE
         )
         val theme = mSettings.getBoolean(NetworkConstants.THEME, true)
@@ -37,30 +37,36 @@ class SettingsFragment : Fragment() {
         darkButton.setOnClickListener {
             if (theme) {
                 mSettings.edit { putBoolean(NetworkConstants.THEME, false) }.apply {
-                    startActivity(Intent(context, MainActivity::class.java))
+                    requireActivity().finish()
+                    App.isSettingsFragmentToOpen = true
+                   startActivity(Intent(context, MainActivity::class.java))
                 }
             } else {
-                Toast.makeText(context, "Темная тема установлена", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, requireContext().getString(R.string.darkTheme), Toast.LENGTH_SHORT).show()
             }
         }
 
         lightButton.setOnClickListener {
             if (!theme) {
                 mSettings.edit { putBoolean(NetworkConstants.THEME, true) }.apply {
+                    requireActivity().finish()
+                    App.isSettingsFragmentToOpen = true
                     startActivity(Intent(context, MainActivity::class.java))
                 }
             } else {
-                Toast.makeText(context, "Светлая тема установлена", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, requireContext().getString(R.string.lightTheme), Toast.LENGTH_SHORT).show()
             }
         }
 
         logoMovie.setOnClickListener {
-            val browseIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themoviedb.org"))
+            val browseIntent = Intent(Intent.ACTION_VIEW, Uri.parse(URI))
             startActivity(browseIntent)
         }
     }
 
     companion object {
         const val TAG = "SettingsFragment"
+        const val URI  = "https://www.themoviedb.org"
+        const val SETTINGS = "Settings"
     }
 }
