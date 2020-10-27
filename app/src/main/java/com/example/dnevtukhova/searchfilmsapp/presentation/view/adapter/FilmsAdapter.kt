@@ -14,12 +14,12 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
+import kotlinx.android.synthetic.main.item_film.view.*
 import testing.OpenForTesting
 import java.util.*
 
 @OpenForTesting
 class FilmsAdapter(
-    private val context: Context,
     private val inflater: LayoutInflater,
     private val listener: OnFilmsClickListener
 ) : RecyclerView.Adapter<FilmsItemViewHolder>() {
@@ -44,11 +44,6 @@ class FilmsAdapter(
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: FilmsItemViewHolder, position: Int) {
-        holder.container.animation =
-            AnimationUtils.loadAnimation(
-                context,
-                R.anim.my_animation
-            )
         val item = items[position]
         holder.bind(item)
         holder.itemView.setOnClickListener { listener.onFilmsClick(item, position) }
@@ -71,7 +66,6 @@ class FilmsItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val imageFilm: ImageView = itemView.findViewById(R.id.image)
     private val imageFavourite: ImageView = itemView.findViewById(R.id.imageFavourite)
     private val imageWatchLater: ImageView = itemView.findViewById(R.id.watchLater)
-    var container: ConstraintLayout = itemView.findViewById(R.id.container)
 
     fun bind(item: FilmsItem) {
         titleTv.text = item.title
@@ -94,5 +88,10 @@ class FilmsItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         } else {
             imageWatchLater.setImageResource(R.drawable.ic_notifications_burgundy_24dp)
         }
+        itemView.container.animation =
+            AnimationUtils.loadAnimation(
+                itemView.context,
+                R.anim.my_animation
+            )
     }
 }

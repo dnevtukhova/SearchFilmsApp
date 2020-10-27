@@ -26,28 +26,38 @@ class MainActivity : AppCompatActivity(),
     var filmsItem: FilmsItem? = null
 
     companion object {
+        const val FILM_FROM_DETAIL = "film from detail"
         const val FILM_FROM_NOTIFICATION = "film from notification"
         const val TAG = "MainActivity"
+        const val SETTINGS = "Settings"
     }
 
     @SuppressLint("ResourceAsColor")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
+
         val mSettings = App.instance.applicationContext.getSharedPreferences(
-            "Settings",
+            SETTINGS,
             Context.MODE_PRIVATE
         )
+
         val theme = mSettings.getBoolean(NetworkConstants.THEME, true)
+
         if (theme) {
             setTheme(R.style.LightTheme)
         } else {
             setTheme(R.style.DarkTheme)
         }
+
         filmsItem = intent.getParcelableExtra(FILM_FROM_NOTIFICATION)
-        Log.d("TAG", filmsItem.toString())
+      //  filmsItem = intent.getParcelableExtra(FILM_FROM_DETAIL)
+
         Log.d(TAG, "filmsItem $filmsItem")
+
         openFragment(filmsItem)
+
         setBottomNavigation()
     }
 
@@ -57,7 +67,7 @@ class MainActivity : AppCompatActivity(),
                 DetailFragment.TAG
             )
         ) {
-            if (App.favoriteF) {
+            if (App.isFavoriteFragmentToOpen) {
                 supportFragmentManager
                     .beginTransaction()
                     .replace(
@@ -67,7 +77,7 @@ class MainActivity : AppCompatActivity(),
                     )
                     .commit()
             }
-            if (App.listF) {
+            if (App.isListFragmentToOpen) {
                 supportFragmentManager
                     .beginTransaction()
                     .replace(
@@ -77,16 +87,6 @@ class MainActivity : AppCompatActivity(),
                     )
                     .commit()
             }
-        } else if (App.settingsF) {
-            App.settingsF = false
-            supportFragmentManager
-                .beginTransaction()
-                .replace(
-                    R.id.fragmentContainer,
-                    FilmsListFragment(),
-                    FilmsListFragment.TAG
-                )
-                .commit()
         } else {
             showExitDialog()
         }
@@ -139,11 +139,10 @@ class MainActivity : AppCompatActivity(),
         bar.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.film_favorite -> {
-                    //  supportActionBar?.show()
-                    App.favoriteF = true
-                    App.listF = false
-                    App.watchLaterF = false
-                    App.settingsF = false
+                    supportActionBar?.show()
+                    App.isFavoriteFragmentToOpen = true
+                    App.isListFragmentToOpen = false
+                    App.isSettingsFragmentToOpen = false
                     supportFragmentManager
                         .beginTransaction()
                         .replace(
@@ -154,11 +153,10 @@ class MainActivity : AppCompatActivity(),
                         .commit()
                 }
                 R.id.all_films -> {
-                    supportActionBar?.show()
-                    App.listF = true
-                    App.favoriteF = false
-                    App.watchLaterF = false
-                    App.settingsF = false
+                     supportActionBar?.show()
+                    App.isListFragmentToOpen = true
+                    App.isFavoriteFragmentToOpen = false
+                    App.isSettingsFragmentToOpen = false
                     supportFragmentManager
                         .beginTransaction()
                         .replace(
@@ -170,10 +168,9 @@ class MainActivity : AppCompatActivity(),
                 }
                 R.id.filmsWatchLater -> {
                     supportActionBar?.show()
-                    App.listF = false
-                    App.favoriteF = false
-                    App.watchLaterF = true
-                    App.settingsF = false
+                    App.isListFragmentToOpen = false
+                    App.isFavoriteFragmentToOpen = false
+                    App.isSettingsFragmentToOpen = false
                     supportFragmentManager
                         .beginTransaction()
                         .replace(
@@ -209,7 +206,7 @@ class MainActivity : AppCompatActivity(),
                 .addToBackStack(DetailFragment.TAG)
                 .commit()
         } else {
-            if (App.listF) {
+            if (App.isListFragmentToOpen) {
                 supportFragmentManager
                     .beginTransaction()
                     .replace(
@@ -219,7 +216,7 @@ class MainActivity : AppCompatActivity(),
                     )
                     .commit()
             }
-            if (App.favoriteF) {
+            if (App.isFavoriteFragmentToOpen) {
                 supportFragmentManager
                     .beginTransaction()
                     .replace(
@@ -229,13 +226,13 @@ class MainActivity : AppCompatActivity(),
                     )
                     .commit()
             }
-            if (App.watchLaterF) {
+            if (App.isSettingsFragmentToOpen) {
                 supportFragmentManager
                     .beginTransaction()
                     .replace(
                         R.id.fragmentContainer,
-                        WatchLaterFragment(),
-                        WatchLaterFragment.TAG
+                        SettingsFragment(),
+                        SettingsFragment.TAG
                     )
                     .commit()
             }

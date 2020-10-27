@@ -13,7 +13,7 @@ internal class FilmsInteractorTest {
     val repo = mock(FilmsRepository::class.java)
     val serverApi = mock(ServerApi::class.java)
     val filmsInteractor = FilmsInteractor(serverApi, repo)
-    val filmsItem = FilmsItem(1, "filmTest", "description", "image", true, true, null)
+    val filmsItem = FilmsItem(1, "filmTest", "description", "image", true, true, null, 1f)
 
     @Test
     fun selectFavorite() {

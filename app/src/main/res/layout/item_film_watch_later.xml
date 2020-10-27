@@ -1,70 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/bgColor"
-    android:id="@+id/container">
+    android:id="@+id/containerWatchLater">
 
     <ImageView
-        android:id="@+id/image"
+        android:id="@+id/imageWatchLater"
         android:layout_width="100dp"
         android:layout_height="150dp"
         tools:src="@tools:sample/avatars"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+
         android:layout_margin="5dp"
         tools:ignore="ContentDescription"/>
 
     <TextView
         style="@style/SearchFilmTitle"
-        android:id="@+id/titleTv"
+        android:id="@+id/titleTvWatchLater"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toTopOf="@id/descriptionFilm"
-        app:layout_constraintStart_toEndOf="@id/image"
-        app:layout_constraintTop_toTopOf="@id/image"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        app:layout_constraintBottom_toTopOf="@id/dateWatchLater"
+        app:layout_constraintStart_toEndOf="@id/imageWatchLater"
+        app:layout_constraintTop_toTopOf="@id/imageWatchLater"
         app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintEnd_toEndOf="@id/descriptionFilm"
+        app:layout_constraintEnd_toEndOf="parent"
         android:textColor="?attr/textColor"
         tools:text="Title very big title jkgjjkj  hgkjhkhkhkhkhklhlkhlk"/>
 
     <TextView
-        android:id="@+id/descriptionFilm"
+        android:id="@+id/dateWatchLater"
         style="@style/SearchFilmDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="3"
         android:layout_marginEnd="16dp"
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/titleTv"
-        app:layout_constraintTop_toBottomOf="@id/titleTv"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/dateToWatchImage"
+        app:layout_constraintTop_toBottomOf="@id/titleTvWatchLater"
+        app:layout_constraintStart_toEndOf="@id/dateToWatchImage"
         android:textColor="?attr/textColor"
         tools:text="Писатель Джек Торренс (Джек Николсон) с женой и сыном Денни         приезжает в отель Оверлок, расположенный на снежных вершинах Колорадо. Роскошный интерьер         гостиницы, затерянной в белом одиночестве, нагромождение залов, симметричных коридоров,         головоломка лабиринта. Так начинается фильм «Сияние» (1979 г.) по роману Стивена Кинга."/>
     <ImageView
-        android:id="@+id/watchLater"
+        android:id="@+id/dateToWatchImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:layout_marginEnd="25dp"
-        app:layout_constraintRight_toLeftOf="@id/imageFavourite"
-        app:layout_constraintTop_toBottomOf="@id/descriptionFilm"
+        app:layout_constraintStart_toStartOf="@id/titleTvWatchLater"
+        app:layout_constraintTop_toBottomOf="@id/titleTvWatchLater"
         tools:src="@drawable/ic_notifications_none_black_24dp"
         android:contentDescription="@string/watchlaterimage" />
 
-    <ImageView
-        android:id="@+id/imageFavourite"
+    <TextView
+        android:id="@+id/cancelNotification"
         android:contentDescription="@string/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        tools:src="@drawable/ic_favorite_border_black_24dp"
-        app:layout_constraintLeft_toRightOf="@id/watchLater"
+        android:layout_marginEnd="25dp"
+        tools:text="Отменить"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/descriptionFilm"/>
+        app:layout_constraintTop_toBottomOf="@id/dateWatchLater"
+        style="@style/SearchFilmDescription"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

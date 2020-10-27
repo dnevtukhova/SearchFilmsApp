@@ -15,6 +15,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.example.dnevtukhova.searchfilmsapp.R
+import com.example.dnevtukhova.searchfilmsapp.presentation.view.adapter.FilmsItemViewHolder
 import org.hamcrest.Matcher
 import org.junit.Rule
 import org.junit.Test
@@ -39,7 +40,7 @@ class FilmsListFragmentTest {
     @Test
     fun openDetailFilm() {
         onView(withId(R.id.recyclerViewFragment)).perform(
-            RecyclerViewActions.actionOnItemAtPosition<FilmsListFragment.FilmsItemViewHolder>(
+            RecyclerViewActions.actionOnItemAtPosition<FilmsItemViewHolder>(
                 3,
                 click()
             )
@@ -50,7 +51,7 @@ class FilmsListFragmentTest {
     @Test
     fun addToFavorite() {
         onView(withId(R.id.recyclerViewFragment)).perform(
-            RecyclerViewActions.actionOnItemAtPosition<FilmsListFragment.FilmsItemViewHolder>(
+            RecyclerViewActions.actionOnItemAtPosition<FilmsItemViewHolder>(
                 0,
                 onClickView(R.id.imageFavourite)
             )

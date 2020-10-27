@@ -6,12 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.*
-import android.widget.AbsListView
-import android.widget.DatePicker
-import android.widget.SearchView
-import android.widget.TimePicker
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.content.edit
@@ -22,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.dnevtukhova.searchfilmsapp.App
 import com.example.dnevtukhova.searchfilmsapp.R
 import com.example.dnevtukhova.searchfilmsapp.data.api.NetworkConstants.PAGE_NUMBER
 import com.example.dnevtukhova.searchfilmsapp.data.entity.FilmsItem
@@ -62,9 +61,10 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         const val CHANNEL_ID = "channel"
         const val FILMS_ITEM_EXTRA = "filmsItemExtra"
         const val BUNDLE = "bundle"
+        const val NOTIFICATIONS_ACTIONS = "com.dnevtukhova.searchfilmsapp.NOTIFICATIONS"
+        const val ITEM_COUNT  = 20
     }
 
-    @SuppressLint("ResourceType")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -94,7 +94,13 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         filmsViewModel.error.observe(
             this.viewLifecycleOwner,
             { error ->
-                requireView().showSnackbar("Ошибка $error", Snackbar.LENGTH_LONG, "Обновить") {
+                requireView().showSnackbar(
+                    "${requireContext().getString(R.string.errorText)} $error",
+                    Snackbar.LENGTH_LONG,
+                    requireContext().getString(
+                        R.string.update
+                    )
+                ) {
                     filmsViewModel.refreshAllFilms()
                 }
             })
@@ -153,7 +159,6 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         recycler.layoutManager = layoutManager
         adapterFilms =
             FilmsAdapter(
-                requireContext(),
                 LayoutInflater.from(context),
                 object :
                     FilmsAdapter.OnFilmsClickListener {
@@ -232,7 +237,6 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         val layoutManagerSearch = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         recyclerViewFragmentSearch.layoutManager = layoutManagerSearch
         adapterFilmsForSearch = FilmsAdapter(
-            requireContext(),
             LayoutInflater.from(context),
             object : FilmsAdapter.OnFilmsClickListener {
                 override fun onFilmsClick(filmsItem: FilmsItem, position: Int) {
@@ -253,15 +257,14 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
 
     private fun fetchData() {
         val page = filmsViewModel.mSettings.getInt(PAGE_NUMBER, 0)
-        Log.d("page", "$page")
-        val page2 = page + 1
-        filmsViewModel.mSettings.edit { putInt(PAGE_NUMBER, page2) }.apply {
+        val nextPage = page + 1
+        filmsViewModel.mSettings.edit { putInt(PAGE_NUMBER, nextPage) }.apply {
         }
         filmsViewModel.refreshAllFilms()
         recycler.post {
             adapterFilms.notifyItemRangeChanged(
                 layoutManager.itemCount,
-                20
+                ITEM_COUNT
             )
         }
     }
@@ -305,39 +308,49 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     private fun setAlarm() {
         Log.d(TAG, "setAlarm")
         dateNotification = calendar.timeInMillis
-        myFilmsItem!!.dateToWatch = dateNotification
-        filmsViewModel.addFilm(myFilmsItem!!)
-        filmsViewModel.changeWatchLater(myFilmsItem!!)
-        adapterFilms.notifyItemChanged(myPosition!!)
-        adapterFilmsForSearch.notifyDataSetChanged()
-        intent?.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
-        pIntentOnce =
-            PendingIntent.getBroadcast(
-                context,
-                0,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        if (Build.VERSION.SDK_INT >= 23) {
-            am?.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                dateNotification!!,
-                pIntentOnce
-            )
-        } else {
-            am?.setExact(
-                AlarmManager.RTC_WAKEUP,
-                dateNotification!!,
-                pIntentOnce
-            )
+        if (dateNotification!!<GregorianCalendar().timeInMillis) {
+            Toast.makeText(
+                requireContext(),
+                requireContext().getString(R.string.dateInFutureError),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        else {
+            myFilmsItem!!.dateToWatch = dateNotification
+            filmsViewModel.addFilm(myFilmsItem!!)
+            filmsViewModel.changeWatchLater(myFilmsItem!!)
+            adapterFilms.notifyItemChanged(myPosition!!)
+            adapterFilmsForSearch.notifyDataSetChanged()
+            intent?.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+            pIntentOnce =
+                PendingIntent.getBroadcast(
+                    context,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            if (Build.VERSION.SDK_INT >= 23) {
+                am?.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    dateNotification!!,
+                    pIntentOnce
+                )
+            } else {
+                am?.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    dateNotification!!,
+                    pIntentOnce
+                )
+            }
         }
     }
 
     fun createIntent(filmsItem: FilmsItem): Intent {
-        val intent = Intent("${filmsItem.id}", null, context, Receiver::class.java)
+        val intent = Intent("${filmsItem.id}", null, context, NotificationReceiver::class.java)
         val bundle = Bundle()
         bundle.putParcelable(FILMS_ITEM_EXTRA, filmsItem)
         intent.putExtra(BUNDLE, bundle)
+        intent.action = NOTIFICATIONS_ACTIONS
         return intent
     }
 
@@ -399,6 +412,7 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.settings -> {
+                App.isSettingsFragmentToOpen = true
                 requireActivity().supportFragmentManager
                     .beginTransaction()
                     .replace(
@@ -406,11 +420,13 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         SettingsFragment(),
                         SettingsFragment.TAG
                     )
-                    .addToBackStack(SettingsFragment.TAG)
+                    // .addToBackStack(SettingsFragment.TAG)
                     .commit()
                 return false
             }
         }
         return super.onOptionsItemSelected(item)
     }
+
+
 }

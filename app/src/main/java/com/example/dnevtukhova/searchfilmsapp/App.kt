@@ -12,10 +12,10 @@ class App : Application(), HasActivityInjector {
 
     companion object {
         lateinit var instance: App
-        var favoriteF: Boolean = false
-        var listF: Boolean = true
-        var watchLaterF: Boolean = false
-        var settingsF: Boolean = false
+        var isFavoriteFragmentToOpen: Boolean = false
+        var isListFragmentToOpen: Boolean = true
+        var isSettingsFragmentToOpen: Boolean = false
+        var isDetailFragmentToOpen: Boolean = false
     }
 
     @Inject
