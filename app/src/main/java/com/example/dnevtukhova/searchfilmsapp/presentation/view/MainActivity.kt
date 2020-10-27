@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity(),
     var filmsItem: FilmsItem? = null
 
     companion object {
+        const val FILM_FROM_DETAIL = "film from detail"
         const val FILM_FROM_NOTIFICATION = "film from notification"
         const val TAG = "MainActivity"
         const val SETTINGS = "Settings"
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity(),
         }
 
         filmsItem = intent.getParcelableExtra(FILM_FROM_NOTIFICATION)
+      //  filmsItem = intent.getParcelableExtra(FILM_FROM_DETAIL)
 
         Log.d(TAG, "filmsItem $filmsItem")
 

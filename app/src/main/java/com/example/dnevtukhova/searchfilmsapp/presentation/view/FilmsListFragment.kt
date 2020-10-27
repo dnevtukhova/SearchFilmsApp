@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -93,7 +94,13 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         filmsViewModel.error.observe(
             this.viewLifecycleOwner,
             { error ->
-                requireView().showSnackbar("${requireContext().getString(R.string.errorText)} $error", Snackbar.LENGTH_LONG, requireContext().getString(R.string.update)) {
+                requireView().showSnackbar(
+                    "${requireContext().getString(R.string.errorText)} $error",
+                    Snackbar.LENGTH_LONG,
+                    requireContext().getString(
+                        R.string.update
+                    )
+                ) {
                     filmsViewModel.refreshAllFilms()
                 }
             })
@@ -302,7 +309,11 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
         Log.d(TAG, "setAlarm")
         dateNotification = calendar.timeInMillis
         if (dateNotification!!<GregorianCalendar().timeInMillis) {
-            Toast.makeText(requireContext(), requireContext().getString(R.string.dateInFutureError), Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                requireContext(),
+                requireContext().getString(R.string.dateInFutureError),
+                Toast.LENGTH_LONG
+            ).show()
         }
         else {
             myFilmsItem!!.dateToWatch = dateNotification
@@ -409,7 +420,7 @@ open class FilmsListFragment : Fragment(), DatePickerDialog.OnDateSetListener,
                         SettingsFragment(),
                         SettingsFragment.TAG
                     )
-                   // .addToBackStack(SettingsFragment.TAG)
+                    // .addToBackStack(SettingsFragment.TAG)
                     .commit()
                 return false
             }

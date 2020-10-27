@@ -23,8 +23,8 @@ class FilmsRepositoryTest {
         filmsDao = spy(FilmsDao::class.java)
         repo = FilmsRepository(filmsDao)
         filmsTest = mutableListOf<FilmsItem>()
-        film = FilmsItem(2, "filmTest2", "description2", "image2", true, true, 1212121212121L)
-        filmsTest.add(FilmsItem(1, "filmTest", "description", "image", true, true, null))
+        film = FilmsItem(2, "filmTest2", "description2", "image2", true, true, 1212121212121L, 1f)
+        filmsTest.add(FilmsItem(1, "filmTest", "description", "image", true, true, null, 1f))
     }
 
     @Test

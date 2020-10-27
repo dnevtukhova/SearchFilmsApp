@@ -22,7 +22,7 @@ class FilmsDaoTest : FilmsDbTest() {
     @Before
     fun init() {
         filmsTest = mutableListOf<FilmsItem>()
-        filmsTest.add(FilmsItem(1, "filmTest", "description", "image", true, true, null))
+        filmsTest.add(FilmsItem(1, "filmTest", "description", "image", true, true, null, 1f))
         filmsTest.add(
             FilmsItem(
                 2,
@@ -31,7 +31,8 @@ class FilmsDaoTest : FilmsDbTest() {
                 "image2",
                 true,
                 false,
-                1212121212121L
+                1212121212121L,
+                1f
             )
         )
         db.getFilmsDao().insertAll(filmsTest)

@@ -43,10 +43,10 @@ class DetailFragment : Fragment(), Injectable {
     }
 
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ResourceAsColor")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        retainInstance = true
         progressbarLoadImage.visibility = View.INVISIBLE
 
         val bundle = arguments
@@ -75,9 +75,15 @@ class DetailFragment : Fragment(), Injectable {
                 if (!filmsDetail.favorite) {
                     imageFavoriteDetail.setImageResource(R.drawable.ic_favorite_red_48dp)
                 }
-                ratingText.text = "${requireContext().getString(R.string.ratingText)} ${filmsDetail.average}"
-            })
 
+                ratingText.text =
+                    "${requireContext().getString(R.string.ratingText)} ${filmsDetail.average}"
+
+                onClickComponent(filmsDetail)
+            })
+    }
+
+    private fun onClickComponent(filmsdetail: FilmsItem) {
         imageShared.setOnClickListener {
             val i = Intent(Intent.ACTION_SEND)
             i.type = "text/plain"
@@ -86,6 +92,17 @@ class DetailFragment : Fragment(), Injectable {
             i.putExtra(Intent.EXTRA_TEXT, text)
             startActivity(i)
         }
+
+//        imageFavoriteDetail.setOnClickListener {
+//            detailViewViewModel.selectFavorite(filmsdetail)
+//            createIntent(filmsdetail)
+//        }
+    }
+
+    private fun createIntent (filmsdetail: FilmsItem) {
+        val intent = Intent("${filmsdetail.id}", null, context, MainActivity::class.java)
+        intent.putExtra(MainActivity.FILM_FROM_DETAIL, filmsdetail)         //requireFragmentManager().beginTransaction().add(DetailFragment.newInstance(), TAG).commit()
+        startActivity(Intent(intent))
     }
 
     private fun loadPoster() {

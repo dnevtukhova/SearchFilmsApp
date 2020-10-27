@@ -75,7 +75,7 @@ class FilmsItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             .placeholder(R.drawable.ic_photo_black_24dp)
             .error(R.drawable.ic_error_outline_black_24dp)
             .centerCrop()
-            .transform(RoundedCorners(R.dimen.cornerRadius))
+            .transform(RoundedCorners(30))
             .into(imageFilm)
 
         if (item.favorite) {

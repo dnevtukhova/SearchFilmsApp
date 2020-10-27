@@ -25,6 +25,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="2"
         app:layout_constraintBottom_toTopOf="@id/dateWatchLater"
         app:layout_constraintStart_toEndOf="@id/imageWatchLater"
         app:layout_constraintTop_toTopOf="@id/imageWatchLater"

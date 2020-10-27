@@ -15,6 +15,7 @@ class App : Application(), HasActivityInjector {
         var isFavoriteFragmentToOpen: Boolean = false
         var isListFragmentToOpen: Boolean = true
         var isSettingsFragmentToOpen: Boolean = false
+        var isDetailFragmentToOpen: Boolean = false
     }
 
     @Inject
